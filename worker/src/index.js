@@ -2,7 +2,8 @@
 // Secrets required: APP_TOKEN and GEMINI_API_KEY
 const MAX_BODY = 64_000;
 const MAX_PAGE = 900_000;
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-auto";
+const GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"];
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), {
   status,
@@ -174,24 +175,34 @@ async function bodyJson(request, limit = MAX_BODY) {
 
 async function chatProxy(request, env, headers) {
   const body = await bodyJson(request, 1_500_000);
-  body.model = MODEL;
   body.messages = Array.isArray(body.messages) ? body.messages.slice(-16) : [];
   body.max_tokens = Math.min(Number(body.max_tokens) || 1800, 2500);
   delete body.tools; delete body.tool_choice; delete body.n;
-  const upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-    method: "POST",
-    headers: { "content-type": "application/json", "authorization": `Bearer ${env.GEMINI_API_KEY}` },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(45_000)
-  });
-  if (!upstream.ok) {
+  let lastStatus = 502;
+  for (const model of GEMINI_MODELS) {
+    body.model = model;
+    let upstream;
+    try {
+      upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+        method: "POST",
+        headers: { "content-type": "application/json", "authorization": `Bearer ${env.GEMINI_API_KEY}` },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(45_000)
+      });
+    } catch { continue; }
+    if (upstream.ok) {
+      const outHeaders = new Headers(headers);
+      outHeaders.set("content-type", upstream.headers.get("content-type") || "application/json");
+      outHeaders.set("x-ai-hub-model", model);
+      return new Response(upstream.body, { status: 200, headers: outHeaders });
+    }
+    lastStatus = upstream.status;
     upstream.body?.cancel();
-    const status = [400, 401, 403, 404, 429].includes(upstream.status) ? upstream.status : 502;
-    return json({ error: { message: status === 429 ? "Model rate limit reached" : "AI provider request failed" } }, status, headers);
+    // Retry a different Gemini model only for missing models or temporary provider failures.
+    if (lastStatus !== 404 && lastStatus < 500) break;
   }
-  const outHeaders = new Headers(headers);
-  outHeaders.set("content-type", upstream.headers.get("content-type") || "application/json");
-  return new Response(upstream.body, { status: 200, headers: outHeaders });
+  const status = [400, 401, 403, 404, 429].includes(lastStatus) ? lastStatus : 502;
+  return json({ error: { message: status === 429 ? "Model rate limit reached" : "AI provider request failed" } }, status, headers);
 }
 
 export default {
