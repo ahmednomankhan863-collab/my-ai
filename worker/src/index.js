@@ -3,7 +3,35 @@
 const MAX_BODY = 64_000;
 const MAX_PAGE = 900_000;
 const MODEL = "gemini-auto";
-const GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"];
+const GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+let modelCache = { at: 0, ids: [] };
+
+async function availableGeminiModels(env) {
+  if (modelCache.ids.length && Date.now() - modelCache.at < 3_600_000) return modelCache.ids;
+  let ids = [];
+  try {
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/models", {
+      headers: { "authorization": `Bearer ${env.GEMINI_API_KEY}` },
+      signal: AbortSignal.timeout(12_000)
+    });
+    if (r.ok) ids = ((await r.json()).data || []).map(x => x.id || "");
+    else r.body?.cancel();
+  } catch {}
+  if (!ids.length) try {
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+      headers: { "x-goog-api-key": env.GEMINI_API_KEY },
+      signal: AbortSignal.timeout(12_000)
+    });
+    if (r.ok) ids = ((await r.json()).models || [])
+      .filter(x => (x.supportedGenerationMethods || []).includes("generateContent"))
+      .map(x => (x.name || "").replace(/^models\//, ""));
+    else r.body?.cancel();
+  } catch {}
+  ids = [...new Set(ids.filter(x => /gemini/i.test(x) && /flash/i.test(x) && !/image|tts|live|audio/i.test(x)))];
+  ids.sort((a, b) => Number(/preview|exp/i.test(a)) - Number(/preview|exp/i.test(b)) || b.localeCompare(a, undefined, { numeric: true }));
+  modelCache = { at: Date.now(), ids: ids.slice(0, 8) };
+  return modelCache.ids;
+}
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), {
   status,
@@ -179,7 +207,9 @@ async function chatProxy(request, env, headers) {
   body.max_tokens = Math.min(Number(body.max_tokens) || 1800, 2500);
   delete body.tools; delete body.tool_choice; delete body.n;
   let lastStatus = 502;
-  for (const model of GEMINI_MODELS) {
+  const detected = await availableGeminiModels(env);
+  const candidates = [...new Set([...detected, ...GEMINI_MODELS])];
+  for (const model of candidates) {
     body.model = model;
     let upstream;
     try {
@@ -223,8 +253,14 @@ export default {
       if (!allowed.success) return json({ error: "Too many requests" }, 429, headers);
     }
     try {
-      if (url.pathname === "/health") return json({ ok: true, model: MODEL, tools: ["read", "search", "research"] }, 200, headers);
-      if (url.pathname === "/v1/models" && request.method === "GET") return json({ object: "list", data: [{ id: MODEL, object: "model", architecture: { input_modalities: ["text", "image"] } }] }, 200, headers);
+      if (url.pathname === "/health") {
+        const ids = await availableGeminiModels(env), model = ids[0] || MODEL;
+        return json({ ok: true, model, detectedModels: ids.length, tools: ["read", "search", "research"] }, 200, headers);
+      }
+      if (url.pathname === "/v1/models" && request.method === "GET") {
+        const ids = await availableGeminiModels(env), list = ids.length ? ids : [MODEL];
+        return json({ object: "list", data: list.map(id => ({ id, object: "model", architecture: { input_modalities: ["text", "image"] } })) }, 200, headers);
+      }
       if (url.pathname === "/v1/chat/completions" && request.method === "POST") return chatProxy(request, env, headers);
       if (request.method !== "POST") return json({ error: "Not found" }, 404, headers);
       const body = await bodyJson(request);
