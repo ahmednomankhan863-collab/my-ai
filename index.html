@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src data:">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src 'self' data:; manifest-src 'self'; worker-src 'self'"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#0f766e"><meta name="mobile-web-app-capable" content="yes">
 <title>AI Hub</title>
 <style>
@@ -23,7 +23,7 @@ textarea{resize:none}footer textarea{max-height:140px}
 .a small{display:block;color:var(--mu);margin-bottom:2px}.a u{cursor:pointer}
 .a pre{background:var(--c);padding:9px;border-radius:8px;overflow-x:auto}
 .a code{background:var(--c);padding:1px 4px;border-radius:4px}.a pre code{background:none;padding:0}
-.mu{color:var(--mu)}.er{color:#d33;display:block}
+.a.f{border:2px solid var(--ac)}.a.rv{font-size:14px;color:var(--mu)}.mu{color:var(--mu)}.er{color:#d33;display:block}
 dialog{width:min(94vw,520px);max-height:88vh;border:1px solid var(--bd);border-radius:16px;background:var(--bg);color:var(--fg);padding:14px}
 dialog::backdrop{background:#0009}dialog h3{margin:14px 0 6px}
 .r{display:flex;gap:8px;margin:6px 0}.card{border:1px solid var(--bd);border-radius:12px;padding:10px;margin:8px 0;display:grid;gap:6px}
@@ -35,7 +35,7 @@ dialog::backdrop{background:#0009}dialog h3{margin:14px 0 6px}
 <div id="msgs"></div>
 <footer><textarea id="in" rows="1" placeholder="Message"></textarea><button class="p" id="go">Send</button></footer>
 <dialog id="dc"><div class="r"><input id="q" placeholder="Search chats"><button class="p" id="nc">New</button></div><div id="cl"></div><button class="x">Close</button></dialog>
-<dialog id="dm"><h3>Models</h3><p class="mu">Tick several to ask all of them at once.</p><div id="ml"></div><button class="p x">Done</button></dialog>
+<dialog id="dm"><h3>Models</h3><p class="mu">Tick several to ask all of them at once.</p><div id="ml"></div><label class="ck"><input type="checkbox" id="tm">Team mode: models answer, review each other, then the first ticked model writes one final answer</label><button class="p x">Done</button></dialog>
 <dialog id="ds"><h3>Providers</h3><div id="pl"></div><div class="r"><select id="pp"></select><button id="ap">Add</button></div>
 <h3>System prompt for this chat</h3><textarea id="sy" rows="3" placeholder="Optional instructions for the AI"></textarea>
 <h3>Backup</h3><div class="r"><button id="ex">Export</button><button id="im">Import</button></div><p id="st" class="mu"></p>
@@ -44,7 +44,7 @@ dialog::backdrop{background:#0009}dialog h3{margin:14px 0 6px}
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PRE={OpenRouter:['https://openrouter.ai/api/v1','deepseek/deepseek-chat-v3-0324:free'],Groq:['https://api.groq.com/openai/v1','llama-3.3-70b-versatile'],Gemini:['https://generativelanguage.googleapis.com/v1beta/openai','gemini-2.0-flash'],DeepSeek:['https://api.deepseek.com/v1','deepseek-chat'],Custom:['','']};
-let db,S={prov:[],sel:[]},chat,busy=false,ctrl=[];
+let db,S={prov:[],sel:[]},chat,busy=false,halt=false,ctrl=[];
 const toast=m=>{const t=$('#t');t.textContent=m;t.style.opacity=1;setTimeout(()=>t.style.opacity=0,2200)};
 const openDb=()=>new Promise((ok,no)=>{const r=indexedDB.open('aihub',1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv');r.result.createObjectStore('chats',{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const tx=(st,m,f)=>new Promise((ok,no)=>{const t=db.transaction(st,m),q=f(t.objectStore(st));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)});
@@ -57,12 +57,12 @@ const label=k=>{const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));retu
 function lab(){$('#bm').textContent=S.sel.length>1?S.sel.length+' models':S.sel.length?label(S.sel[0]).split(' · ')[0]:'Pick model'}
 function md(t){return t.split('```').map((p,i)=>{if(i%2){const n=p.indexOf('\n');return '<pre><code>'+esc(p.slice(n+1))+'</code></pre>'}return esc(p).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}).join('')}
 const body=a=>md(a.c)+(a.err?'<i class="er">Error: '+esc(a.err)+'</i>':'');
-function render(){$('#ti').textContent=chat.title;$('#msgs').innerHTML=chat.turns.map((t,i)=>`<div class="u">${esc(t.u)}</div>`+t.a.map((a,j)=>`<div class="a" data-t="${i}" data-j="${j}"><small>${esc(a.m)} · <u data-cp>copy</u></small><div class="b">${body(a)}</div></div>`).join('')).join('')||'<p class="mu" style="text-align:center;margin-top:28vh">Pick one or more models, then ask anything.</p>';$('#msgs').scrollTop=1e9}
+function render(){$('#ti').textContent=chat.title;$('#msgs').innerHTML=chat.turns.map((t,i)=>`<div class="u">${esc(t.u)}</div>`+t.a.map((a,j)=>`<div class="a${a.kind=='final'?' f':a.kind?' rv':''}" data-t="${i}" data-j="${j}"><small>${esc(a.m)} · <u data-cp>copy</u></small><div class="b">${body(a)}</div></div>`).join('')).join('')||'<p class="mu" style="text-align:center;margin-top:28vh">Pick one or more models, then ask anything.</p>';$('#msgs').scrollTop=1e9}
 function paint(ch,ti,j){if(chat!==ch)return;const b=document.querySelector(`[data-t="${ti}"][data-j="${j}"] .b`),m=$('#msgs'),n=m.scrollHeight-m.scrollTop-m.clientHeight<160;if(b)b.innerHTML=body(ch.turns[ti].a[j]);if(n)m.scrollTop=1e9}
-async function run(ch,ti,j){const a=ch.turns[ti].a[j],i=a.k.indexOf('|'),p=S.prov.find(x=>x.id==a.k.slice(0,i)),model=a.k.slice(i+1);
+function hist(ch,ti,k){const m=ch.sys?[{role:'system',content:ch.sys}]:[];ch.turns.slice(0,ti).forEach(t=>{m.push({role:'user',content:t.u});const x=t.a.find(z=>z.kind=='final'&&z.c)||t.a.find(z=>z.k==k&&!z.kind&&z.c)||t.a.find(z=>!z.kind&&z.c);if(x)m.push({role:'assistant',content:x.c})});return m}
+async function run(ch,ti,j,u){const a=ch.turns[ti].a[j],i=a.k.indexOf('|'),p=S.prov.find(x=>x.id==a.k.slice(0,i)),model=a.k.slice(i+1);
 if(!p){a.err='Provider was removed';return}
-const c=new AbortController();ctrl.push(c);const msgs=ch.sys?[{role:'system',content:ch.sys}]:[];
-ch.turns.slice(0,ti+1).forEach((t,n)=>{msgs.push({role:'user',content:t.u});if(n<ti){const x=t.a.find(z=>z.k==a.k&&z.c)||t.a.find(z=>z.c);if(x)msgs.push({role:'assistant',content:x.c})}});
+const c=new AbortController();ctrl.push(c);const msgs=[...hist(ch,ti,a.k),{role:'user',content:u||ch.turns[ti].u}];
 try{const h={'Content-Type':'application/json'};if(p.key)h.Authorization='Bearer '+p.key;
 const r=await fetch(p.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:c.signal,headers:h,body:JSON.stringify({model,messages:msgs,stream:true})});
 if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,200));
@@ -71,19 +71,25 @@ for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{s
 for(const l of ls){if(!l.startsWith('data:'))continue;const d=l.slice(5).trim();if(d=='[DONE]')continue;try{a.c+=JSON.parse(d).choices?.[0]?.delta?.content||''}catch{}}paint(ch,ti,j)}
 }catch(e){if(e.name=='AbortError')a.c+=a.c?'':'(stopped)';else a.err=e.message}
 paint(ch,ti,j)}
+async function team(ch,ti){const t=ch.turns[ti],d=t.a.filter(a=>!a.kind&&a.c&&!a.err);if(d.length<2||halt)return;
+const blk=d.map((a,i)=>`Answer ${String.fromCharCode(65+i)}:\n${a.c}`).join('\n\n'),q=`Question:\n${t.u}\n\n${blk}\n\n`;
+const rv=d.map(a=>({k:a.k,m:'Review · '+a.m,c:'',kind:'review'}));t.a.push(...rv);render();
+await Promise.all(rv.map(a=>run(ch,ti,t.a.indexOf(a),q+'Review every answer as a strict fact-checker: list errors, weak reasoning and missing points, and say which parts you trust. Do not assume any answer is right. Be concise.')));
+if(halt)return;t.a.push({k:S.sel[0],m:'Final answer · '+label(S.sel[0]),c:'',kind:'final'});render();
+await run(ch,ti,t.a.length-1,q+'Reviews:\n'+rv.map(a=>a.c).join('\n---\n')+'\n\nWrite the best final answer to the question. Combine the strongest points, fix every error the reviews found, and say plainly where the models disagreed and what remains uncertain. Do not mention answer letters or reviewers.')}
 async function send(){const ta=$('#in'),text=ta.value.trim();if(!text||busy)return;
 if(!S.sel.length){toast('Pick a model first');rm();$('#dm').showModal();return}
 const ch=chat,turn={u:text,a:S.sel.map(k=>({k,m:label(k),c:''}))};ch.turns.push(turn);if(ch.turns.length==1)ch.title=text.slice(0,40);
 ta.value='';grow();render();busy=true;$('#go').textContent='Stop';
-await Promise.all(turn.a.map((_,j)=>run(ch,ch.turns.length-1,j)));
+halt=false;await Promise.all(turn.a.map((_,j)=>run(ch,ch.turns.length-1,j)));if(S.team&&!halt)await team(ch,ch.turns.length-1);
 busy=false;ctrl=[];$('#go').textContent='Send';ch.t=Date.now();await chatPut(ch)}
 const grow=()=>{const t=$('#in');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
-$('#in').oninput=grow;$('#go').onclick=()=>busy?ctrl.forEach(c=>c.abort()):send();
+$('#in').oninput=grow;$('#go').onclick=()=>busy?(halt=true,ctrl.forEach(c=>c.abort())):send();
 document.addEventListener('click',e=>{if(e.target.classList.contains('x'))e.target.closest('dialog').close()});
 $('#msgs').onclick=e=>{if(e.target.dataset.cp===undefined)return;const d=e.target.closest('.a').dataset;navigator.clipboard.writeText(chat.turns[d.t].a[d.j].c).then(()=>toast('Copied'))};
 function rm(){$('#ml').innerHTML=S.prov.map(p=>`<b>${esc(p.name)}</b>`+models(p).map(m=>{const k=p.id+'|'+m;return `<label class="ck"><input type="checkbox" value="${esc(k)}" ${S.sel.includes(k)?'checked':''}>${esc(m)}</label>`}).join('')).join('')||'<p>Add a provider in Settings first.</p>'}
 $('#ml').onchange=()=>{S.sel=[...document.querySelectorAll('#ml input:checked')].map(i=>i.value);kvSet('sel',S.sel);lab()};
-$('#bm').onclick=()=>{rm();$('#dm').showModal()};
+$('#bm').onclick=()=>{rm();$('#tm').checked=!!S.team;$('#dm').showModal()};$('#tm').onchange=e=>{S.team=e.target.checked;kvSet('team',S.team)};
 async function rc(){const q=$('#q').value.toLowerCase(),all=(await chatAll()).sort((a,b)=>b.t-a.t).filter(c=>!q||(c.title+JSON.stringify(c.turns)).toLowerCase().includes(q));$('#cl').innerHTML=all.map(c=>`<div class="row"><span data-o="${c.id}">${esc(c.title)}</span><button data-d="${c.id}">Delete</button></div>`).join('')||'<p class="mu">No chats yet.</p>'}
 $('#bc').onclick=()=>{rc();$('#dc').showModal()};$('#q').oninput=rc;
 $('#nc').onclick=()=>{newChat();render();$('#dc').close()};
@@ -100,7 +106,7 @@ $('#sy').oninput=e=>{chat.sys=e.target.value;if(chat.turns.length)chatPut(chat)}
 $('#ex').onclick=async()=>{const k=confirm('Include API keys in the backup file?\nOK = include, Cancel = leave out');const d={v:1,prov:S.prov.map(p=>k?p:{...p,key:''}),chats:await chatAll()},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));a.download='ai-hub-backup.json';a.click()};
 $('#im').onclick=()=>$('#fi').click();
 $('#fi').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const c of d.chats||[])await chatPut(c);for(const p of d.prov||[]){const x=S.prov.find(z=>z.id==p.id);if(!x)S.prov.push(p);else if(!x.key&&p.key)x.key=p.key}await save();rp();toast('Imported')}catch{toast('Not a valid backup file')}};
-(async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
-const all=(await chatAll()).sort((a,b)=>b.t-a.t);chat=all[0]||newChat();navigator.storage?.persist?.();lab();render();
+(async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.team=!!(await kvGet('team'));S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
+const all=(await chatAll()).sort((a,b)=>b.t-a.t);chat=all[0]||newChat();navigator.storage?.persist?.();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');lab();render();
 if(!S.prov.length){rp();$('#ds').showModal()}})();
 </script></body></html>
