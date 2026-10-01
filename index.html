@@ -30,20 +30,58 @@ dialog::backdrop{background:#0009}dialog h3{margin:14px 0 6px}
 .row{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}.row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ck{display:flex;gap:10px;align-items:center;padding:6px 0}.ck input{width:auto}
 #t{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+header{position:sticky;top:0;background:var(--bg)}#ti{cursor:pointer}
+.u{border-radius:18px 18px 4px 18px;box-shadow:0 1px 2px #0003}
+.a{background:var(--c);border:0;border-radius:4px 18px 18px 18px;padding:12px 14px;line-height:1.6}
+.a small{font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px}.a small:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac)}
+.a.rv{background:none;border:1px dashed var(--bd)}.a.f{border:0;box-shadow:inset 3px 0 0 var(--ac)}
+.a p{margin:.45em 0}.a h3,.a h4,.a h5,.a h6{margin:.9em 0 .3em;line-height:1.3}.a ul,.a ol{margin:.4em 0;padding-left:1.3em}
+.a blockquote{margin:.5em 0;padding-left:10px;border-left:3px solid var(--bd);color:var(--mu)}.a a{color:var(--ac)}
+.cb{margin:8px 0;border-radius:10px;overflow:hidden;border:1px solid var(--bd)}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg);font-size:12px;color:var(--mu)}.ch u{cursor:pointer;padding:2px 6px}
+.cb pre{margin:0;border-radius:0;background:#0b1419;color:#d8e6ec;font-size:13px;line-height:1.5}.cb code{background:none;padding:0}
+.ac{display:flex;gap:16px;font-size:13px;color:var(--mu);margin:2px 6px 6px}.a .ac{margin:8px 0 0}.u+.ac{justify-content:flex-end}.ac u{cursor:pointer;padding:2px 0}
+.dots i{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--ac);animation:bl 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}@keyframes bl{50%{opacity:.25}}
+.em{text-align:center;margin-top:16vh}.em h2{margin:0 0 14px}.em button{margin:4px;border-radius:20px}
+details{margin-top:8px}summary{cursor:pointer;font-size:13px}
+footer textarea,footer button{border-radius:20px}footer button{padding:10px 16px}
+@media(prefers-reduced-motion:reduce){.dots i{animation:none}}
+:root[data-th=light]{--bg:#f5f7f8;--fg:#12202b;--mu:#5d6b76;--c:#e6ecef;--ac:#0f766e;--bd:#d3dce1}:root[data-th=dark]{--bg:#0e1a21;--fg:#e8f0f3;--mu:#8ea0ab;--c:#182831;--ac:#2dd4bf;--bd:#263943}
+#pv{display:flex;gap:10px;align-items:center;padding:6px 10px;border-top:1px solid var(--bd)}#pv:empty{display:none}#pv img{height:48px;border-radius:8px}#pv u{cursor:pointer}
+.u img{max-width:100%;max-height:220px;border-radius:10px;display:block;margin-bottom:6px}
+.on{background:var(--ac)!important;color:var(--bg)}footer button{padding:10px 12px}
+.tw{overflow-x:auto}.a table{border-collapse:collapse;font-size:14px}.a th,.a td{border:1px solid var(--bd);padding:5px 8px;text-align:left}.a th{background:var(--bg)}
+
+/* 2026 UI polish: mobile-first, accessible controls, zero external dependencies */
+button{cursor:pointer;touch-action:manipulation;min-height:42px}button:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid color-mix(in srgb,var(--ac) 55%,transparent);outline-offset:2px}
+.act{min-height:30px;padding:2px 5px;border:0;background:transparent;color:var(--mu);font-size:13px;border-radius:6px}.act:hover{color:var(--fg);background:var(--c)}
+#msgs{scroll-behavior:smooth;overscroll-behavior:contain}.msg{max-width:860px;margin-inline:auto}.a,.u{position:relative}
+footer{background:var(--bg);position:relative}.composer{display:flex;flex:1;align-items:flex-end;gap:8px;min-width:0}.composer textarea{min-height:44px}
+#down{position:fixed;right:16px;bottom:88px;width:44px;height:44px;border-radius:50%;padding:0;box-shadow:0 4px 18px #0004;display:none;z-index:3}
+#meta{font-size:11px;color:var(--mu);padding:0 12px 4px;text-align:right;background:var(--bg)}
+#pv img{cursor:zoom-in}.imgview{padding:0;background:transparent;border:0;max-width:96vw;max-height:92vh}.imgview img{display:block;max-width:96vw;max-height:90vh;border-radius:12px}.imgview button{position:absolute;right:8px;top:8px;border-radius:50%}
+.tok-k{color:#c792ea}.tok-s{color:#c3e88d}.tok-n{color:#f78c6c}.tok-c{color:#78909c;font-style:italic}.tok-f{color:#82aaff}
+.a pre{tab-size:2}.a table{min-width:100%}.a caption{text-align:left}.tw{margin:.65em 0;border-radius:8px}.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.drag{box-shadow:inset 0 0 0 3px var(--ac);background:color-mix(in srgb,var(--ac) 8%,var(--bg))}
+@media(max-width:620px){header{padding:6px;gap:5px}header button{padding:7px 9px;font-size:14px}#msgs{padding:8px}.u{max-width:92%}.a{border-radius:4px 14px 14px 14px}footer{gap:5px;padding-inline:6px}footer>button{width:42px;padding:8px}.composer{gap:5px}#go{width:auto;padding-inline:12px}.ac{gap:8px}.ch{position:sticky;left:0}.em{margin-top:10vh}}
+@media(min-width:900px){#msgs{padding-inline:max(12px,calc((100vw - 900px)/2))}}
 </style></head><body>
 <header><button id="bc">Chats</button><b id="ti">New chat</b><button id="bm">Models</button><button id="bs">Settings</button></header>
-<div id="msgs"></div>
-<footer><textarea id="in" rows="1" placeholder="Message"></textarea><button class="p" id="go">Send</button></footer>
+<main id="msgs" aria-label="Conversation" aria-live="polite"></main>
+<button id="down" aria-label="Scroll to newest message" title="Scroll to bottom">↓</button>
+<div id="pv" aria-label="Image attachment preview"></div><footer id="composer"><button id="at" aria-label="Attach image" title="Attach or paste an image">📎</button><button id="mic" aria-label="Start voice input" title="Voice input">🎤</button><div class="composer"><textarea id="in" rows="1" maxlength="20000" aria-label="Message" placeholder="Message" enterkeyhint="send"></textarea><button class="p" id="go">Send</button></div></footer><div id="meta" aria-live="polite"></div><input type="file" id="fl" accept="image/*" hidden>
+<dialog id="iv" class="imgview"><img id="ivi" alt="Attached image, enlarged"><button class="x" aria-label="Close image">✕</button></dialog>
 <dialog id="dc"><div class="r"><input id="q" placeholder="Search chats"><button class="p" id="nc">New</button></div><div id="cl"></div><button class="x">Close</button></dialog>
-<dialog id="dm"><h3>Models</h3><p class="mu">Tick several to ask all of them at once.</p><div id="ml"></div><label class="ck"><input type="checkbox" id="au">Auto mode (recommended): the app picks working models, they check each other, and you see one final answer. Untick to choose models yourself.</label><label class="ck"><input type="checkbox" id="tm">Team mode: models answer, review each other, then the first ticked model writes one final answer</label><button class="p x">Done</button></dialog>
-<dialog id="ds"><h3>Providers</h3><div id="pl"></div><div class="r"><select id="pp"></select><button id="ap">Add</button></div>
+<dialog id="dm"><h3>Models</h3><p class="mu">Smart mode is recommended. Untick it only when you want to run specific models manually.</p><div id="ml"></div><label class="ck"><input type="checkbox" id="au">Smart mode: simple questions use one reliable model; complex questions are divided into focused tasks and combined into one checked answer.</label><label class="ck"><input type="checkbox" id="tm">Manual Team mode: selected models create separate answers and reviews. Uses more requests and only applies when Smart mode is off.</label><button class="p x">Done</button></dialog>
+<dialog id="ds"><h3>Providers</h3><p class="mu">Keys stay in this browser’s private app storage and are sent only to the provider URL you configure. This app has no analytics or third-party scripts. Use restricted API keys where your provider supports them.</p><div id="pl"></div><div class="r"><select id="pp"></select><button id="ap">Add</button></div>
 <h3>System prompt for this chat</h3><textarea id="sy" rows="3" placeholder="Optional instructions for the AI"></textarea>
-<h3>Backup</h3><div class="r"><button id="ex">Export</button><button id="im">Import</button></div><p id="st" class="mu"></p>
+<h3>Look and voice</h3><div class="r"><select id="th"><option value="">Match phone</option><option value="light">Light</option><option value="dark">Dark</option></select><select id="lg"><option value="">Voice: device language</option><option value="en-US">Voice: English</option><option value="ur-PK">Voice: Urdu</option><option value="hi-IN">Voice: Hindi</option><option value="ar-SA">Voice: Arabic</option></select></div><h3>Data and backup</h3><label class="ck"><input type="checkbox" id="dsav"> Data saver (smaller images, shorter context, and at most two AI calls for complex questions)</label><div class="r"><button id="ex">Export</button><button id="im">Import</button><button id="ci" title="Keeps text but removes saved photos">Clear images</button></div><p id="st" class="mu"></p>
 <input type="file" id="fi" accept=".json" hidden><button class="x">Close</button></dialog>
-<div id="t"></div>
+<div id="t" role="status" aria-live="polite"></div>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const PRE={OpenRouter:['https://openrouter.ai/api/v1','deepseek/deepseek-chat-v3-0324:free'],Groq:['https://api.groq.com/openai/v1','llama-3.3-70b-versatile'],Gemini:['https://generativelanguage.googleapis.com/v1beta/openai','gemini-2.0-flash'],DeepSeek:['https://api.deepseek.com/v1','deepseek-chat'],Custom:['','']};
+const PRE={OpenRouter:['https://openrouter.ai/api/v1','openrouter/free'],Groq:['https://api.groq.com/openai/v1','llama-3.3-70b-versatile'],Gemini:['https://generativelanguage.googleapis.com/v1beta/openai','gemini-3.8-flash'],DeepSeek:['https://api.deepseek.com/v1','deepseek-chat'],Custom:['','']};
 let db,S={prov:[],sel:[]},chat,busy=false,halt=false,ctrl=[];
 const toast=m=>{const t=$('#t');t.textContent=m;t.style.opacity=1;setTimeout(()=>t.style.opacity=0,2200)};
 const openDb=()=>new Promise((ok,no)=>{const r=indexedDB.open('aihub',1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv');r.result.createObjectStore('chats',{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
@@ -54,24 +92,55 @@ const save=()=>kvSet('prov',S.prov);
 const models=p=>(p.models||'').split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
 const newChat=()=>chat={id:Date.now()+'',title:'New chat',t:Date.now(),sys:'',turns:[]};
 const label=k=>{const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));return k.slice(i+1).split('/').pop().replace(':free','')+' · '+(p?p.name:'?')};
-function lab(){if(S.auto){$('#bm').textContent='Auto';return}$('#bm').textContent=S.sel.length>1?S.sel.length+' models':S.sel.length?label(S.sel[0]).split(' · ')[0]:'Pick model'}
-function md(t){return t.split('```').map((p,i)=>{if(i%2){const n=p.indexOf('\n');return '<pre><code>'+esc(p.slice(n+1))+'</code></pre>'}return esc(p).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}).join('')}
-const body=a=>md(a.c)+(a.err&&!a.try?'<i class="er">Error: '+esc(a.err)+'</i>':'')+(a.det?'<details><summary class="mu">How the models worked</summary>'+md(a.det)+'</details>':'');
-function render(){$('#ti').textContent=chat.title;$('#msgs').innerHTML=chat.turns.map((t,i)=>`<div class="u">${esc(t.u)}</div>`+t.a.map((a,j)=>`<div class="a${a.kind=='final'?' f':a.kind?' rv':''}" data-t="${i}" data-j="${j}"><small>${esc(a.m)} · <u data-cp>copy</u></small><div class="b">${body(a)}</div></div>`).join('')).join('')||'<p class="mu" style="text-align:center;margin-top:28vh">Pick one or more models, then ask anything.</p>';$('#msgs').scrollTop=1e9}
+function lab(){if(S.auto){$('#bm').textContent='Smart';return}$('#bm').textContent=S.sel.length>1?S.sel.length+' models':S.sel.length?label(S.sel[0]).split(' · ')[0]:'Pick model'}
+const fm=x=>x.replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*\s][^*]*)\*/g,'<i>$1</i>').replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+function inl(p){let o='',L=null;const cl=()=>{if(L){o+=L=='table'?'</table></div>':'</'+L+'>';L=null}};
+for(const l of esc(p).split('\n')){let m;
+if(m=l.match(/^(#{1,4})\s+(.*)/)){cl();const h=m[1].length+2;o+=`<h${h}>${fm(m[2])}</h${h}>`}
+else if(m=l.match(/^\s*[-*]\s+(.*)/)){if(L!='ul'){cl();o+='<ul>';L='ul'}o+='<li>'+fm(m[1])+'</li>'}
+else if(m=l.match(/^\s*\d+[.)]\s+(.*)/)){if(L!='ol'){cl();o+='<ol>';L='ol'}o+='<li>'+fm(m[1])+'</li>'}
+else if(m=l.match(/^&gt;\s?(.*)/)){cl();o+='<blockquote>'+fm(m[1])+'</blockquote>'}
+else if(/^\s*\|.*\|\s*$/.test(l)){if(/^[\s|:-]+$/.test(l))continue;const h=L!='table';if(h){cl();o+='<div class="tw"><table>';L='table'}o+='<tr>'+l.trim().slice(1,-1).split('|').map(x=>`<${h?'th':'td'}>${fm(x.trim())}</${h?'th':'td'}>`).join('')+'</tr>'}
+else if(!l.trim())cl();else{cl();o+='<p>'+fm(l)+'</p>'}}
+cl();return o}
+function hi(src,lang=''){// Tiny, dependency-free highlighter: fast enough for phones and safe by construction.
+const re=/(\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->|\/\/[^\n]*|#[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b\d+(?:\.\d+)?\b|\b(?:async|await|break|case|catch|class|const|continue|def|delete|do|else|export|extends|false|finally|for|from|function|if|import|in|let|new|null|return|static|super|switch|this|throw|true|try|typeof|var|void|while|with|yield|SELECT|FROM|WHERE|JOIN|INSERT|UPDATE|DELETE|CREATE|TABLE)\b)/g;
+let out='',last=0,m;while((m=re.exec(src))){out+=esc(src.slice(last,m.index));const x=m[0],c=/^(\/\*|\/\/|#|<!--)/.test(x)?'c':/^["'`]/.test(x)?'s':/^\d/.test(x)?'n':'k';out+=`<span class="tok-${c}">${esc(x)}</span>`;last=re.lastIndex}return out+esc(src.slice(last))}
+function md(t){return t.split('```').map((p,i)=>{if(i%2){const n=p.indexOf('\n'),has=n>=0,g=esc((has?p.slice(0,n):'').trim().slice(0,24))||'code',code=has?p.slice(n+1):p;return `<div class="cb"><div class="ch"><span>${g}</span><button class="act" data-cc>Copy code</button></div><pre><code>${hi(code,g)}</code></pre></div>`}return inl(p)}).join('')}
+const body=a=>(a.try&&!a.c?'<span class="dots"><i></i><i></i><i></i></span>':'')+md(a.c)+(a.err&&!a.try?'<i class="er">Error: '+esc(a.err)+'</i>':'')+(a.det?'<details><summary class="mu">How the models worked</summary>'+md(a.det)+'</details>':'');
+const VIS=/vision|-vl|vl-|gemini|llava|pixtral|4o|gemma-?[34]|llama-?[4-9]|maverick|scout|omni|molmo|internvl|openrouter\/free/i;
+function canVision(k){const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i)),m=k.slice(i+1);return p?.vis?.includes(m)||VIS.test(m)}
+const um=(ch,ti,u)=>{const t=ch.turns[ti];return !u&&t.img?{role:'user',content:[{type:'text',text:t.u},{type:'image_url',image_url:{url:t.img}}]}:{role:'user',content:u||t.u}};
+let pend='',rec;
+function setImg(d){pend=d;$('#pv').innerHTML=d?`<img src="${d}" alt="Image ready to send"><button class="act mu" id="rm2">Remove image</button>`:'';meta()}
+const dataBytes=d=>Math.max(0,Math.round((d.length-(d.indexOf(',')+1))*3/4));
+async function pick(f){if(!f)return;if(!f.type.startsWith('image/'))return toast('Please choose an image file');if(f.size>25e6)return toast('That image is over 25 MB');
+try{const b=await createImageBitmap(f,{imageOrientation:'from-image'}),lim=S.saver?768:1024,k=Math.min(1,lim/Math.max(b.width,b.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(b.width*k));c.height=Math.max(1,Math.round(b.height*k));const x=c.getContext('2d',{alpha:false});x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(b,0,0,c.width,c.height);b.close?.();let q=S.saver ? .62 : .76,d=c.toDataURL('image/webp',q);if(!d.startsWith('data:image/webp'))d=c.toDataURL('image/jpeg',q);while(dataBytes(d)>(S.saver?110000:220000)&&q>.42){q-=.08;d=c.toDataURL(d.startsWith('data:image/webp')?'image/webp':'image/jpeg',q)}setImg(d);toast('Image optimized to '+Math.ceil(dataBytes(d)/1024)+' KB')}
+catch{toast('This image format is not supported. Try JPG, PNG or WebP')}}
+function mic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return toast('Voice input needs Chrome or another supported browser');
+if(rec){rec.stop();return}
+try{rec=new SR();rec.lang=S.lang||navigator.language;rec.interimResults=true;rec.continuous=true;const ta=$('#in'),base=ta.value?ta.value.trimEnd()+' ':'';
+rec.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;ta.value=base+t;grow();meta()};
+rec.onend=()=>{rec=null;$('#mic').classList.remove('on');$('#mic').setAttribute('aria-label','Start voice input')};rec.onerror=e=>{if(e.error!='aborted')toast(e.error=='not-allowed'?'Microphone permission was blocked':'Voice input stopped: '+e.error)};
+rec.start();$('#mic').classList.add('on');$('#mic').setAttribute('aria-label','Stop voice input');toast('Listening… tap the microphone to stop')}
+catch{rec=null;toast('Could not start voice input')}}
+const EM='<div class="em"><h2>How can I help?</h2><div>'+['Explain a topic simply','Help me write code','Plan my day','Check my idea'].map(x=>`<button data-sg="${x}">${x}</button>`).join('')+'</div></div>';
+function render(){$('#ti').textContent=chat.title;const n=chat.turns.length-1;
+$('#msgs').innerHTML=chat.turns.map((t,i)=>`<section class="msg"><div class="u">${t.img&&t.img.startsWith('data:image/')?`<img src="${esc(t.img)}" alt="Attached image" loading="lazy">`:''}${esc(t.u)}</div><div class="ac"><button class="act" data-cq="${i}">Copy</button>${i==n?'<button class="act" data-ed>Edit</button>':''}<button class="act" data-del="${i}">Delete</button></div>`+t.a.map((a,j)=>`<article class="a${a.kind=='final'?' f':a.kind?' rv':''}" data-t="${i}" data-j="${j}"><small>${esc(a.m)}</small><div class="b">${body(a)}</div>${a.try?'':`<div class="ac"><button class="act" data-cp>Copy</button>${i==n&&j==t.a.length-1?'<button class="act" data-rg>Regenerate</button>':''}</div>`}</article>`).join('')+'</section>').join('')||EM;requestAnimationFrame(()=>{$('#msgs').scrollTop=1e9;scrollState()});meta()}
 function paint(ch,ti,j){if(chat!==ch)return;const b=document.querySelector(`[data-t="${ti}"][data-j="${j}"] .b`),m=$('#msgs'),n=m.scrollHeight-m.scrollTop-m.clientHeight<160;if(b)b.innerHTML=body(ch.turns[ti].a[j]);if(n)m.scrollTop=1e9}
-function hist(ch,ti,k){const m=ch.sys?[{role:'system',content:ch.sys}]:[];ch.turns.slice(Math.max(0,ti-6),ti).forEach(t=>{m.push({role:'user',content:t.u});const x=t.a.find(z=>z.kind=='final'&&z.c)||t.a.find(z=>z.k==k&&!z.kind&&z.c)||t.a.find(z=>!z.kind&&z.c);if(x)m.push({role:'assistant',content:x.c})});return m}
+function hist(ch,ti,k){const m=ch.sys?[{role:'system',content:ch.sys}]:[],keep=S.saver?3:6;ch.turns.slice(Math.max(0,ti-keep),ti).forEach(t=>{m.push({role:'user',content:t.u});const x=t.a.find(z=>z.kind=='final'&&z.c)||t.a.find(z=>z.k==k&&!z.kind&&z.c)||t.a.find(z=>!z.kind&&z.c);if(x)m.push({role:'assistant',content:x.c})});return m}
+const apiErr=s=>s==401||s==403?'API key rejected':s==404?'Model or endpoint not found':s==408?'Request timed out':s==429?'Model is busy or rate-limited':s>=500?'Provider is temporarily unavailable':'Request failed ('+s+')';
 async function run(ch,ti,j,u){const a=ch.turns[ti].a[j],i=a.k.indexOf('|'),p=S.prov.find(x=>x.id==a.k.slice(0,i)),model=a.k.slice(i+1);
 if(!p){a.err='Provider was removed';return}
-const c=new AbortController();ctrl.push(c);let tm;const st=ms=>{clearTimeout(tm);tm=setTimeout(()=>{a.to=1;c.abort()},ms)};st(40000);const msgs=[...hist(ch,ti,a.k),{role:'user',content:u||ch.turns[ti].u}];
+const c=new AbortController();ctrl.push(c);let tm;const st=ms=>{clearTimeout(tm);tm=setTimeout(()=>{a.to=1;c.abort()},ms)};st(40000);const msgs=[...hist(ch,ti,a.k),um(ch,ti,u)];
 try{const h={'Content-Type':'application/json'};if(p.key)h.Authorization='Bearer '+p.key;
-const r=await fetch(p.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:c.signal,headers:h,body:JSON.stringify({model,messages:msgs,stream:true})});
-if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,200));
+const r=await fetch(p.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:c.signal,headers:h,body:JSON.stringify({model,messages:msgs,stream:true,max_tokens:S.saver?1000:2000})});
+if(!r.ok){r.body?.cancel?.();throw new Error(apiErr(r.status))}
 const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
 for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});st(25000);const ls=buf.split('\n');buf=ls.pop();
 for(const l of ls){if(!l.startsWith('data:'))continue;const d=l.slice(5).trim();if(d=='[DONE]')continue;try{a.c+=JSON.parse(d).choices?.[0]?.delta?.content||''}catch{}}paint(ch,ti,j)}
-}catch(e){if(e.name=='AbortError')a.c+=a.c?'':'(stopped)';else a.err=e.message}
+}catch(e){if(e.name=='AbortError'){if(halt)a.c+=a.c?'':'(stopped)';else{a.c='';a.err=a.to?'The model took too long. Trying another one…':'Request cancelled'}}else{a.c='';a.err=e.message||'The provider request failed'}}
 clearTimeout(tm);paint(ch,ti,j)}
-const W=s=>new Set(s.toLowerCase().match(/\w{4,}/g)||[]),sim=(a,b)=>{const x=W(a),y=W(b);let i=0;x.forEach(w=>y.has(w)&&i++);return i/(x.size+y.size-i||1)};
 function note(k,ok,ms,e){if(halt)return;const h=S.h[k]||(S.h[k]={ok:0,f:0,ms:0,u:0});if(ok){h.ok++;h.f=0;h.u=0;h.ms=h.ms?h.ms*.7+ms*.3:ms}else{h.f++;h.u=Date.now()+(e==403||e==404?864e5:e==401?36e5:Math.min((e==429?6e4:12e4)*h.f,18e5))}kvSet('health',S.h)}
 const sc=k=>{const h=S.h[k]||{};return -Math.min(h.ok||0,5)+(h.ms||0)/8000+(h.f||0)*2};
 function pool(){const all=S.prov.flatMap(p=>models(p).map(m=>p.id+'|'+m)),n=Date.now();let o=all.filter(k=>!(S.h[k]&&S.h[k].u>n));if(!o.length)o=all;
@@ -79,51 +148,81 @@ o=o.map(k=>[k,sc(k)+Math.random()*1.5]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);cons
 async function ask(k,msgs,mt){const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));if(!p)throw 0;
 const c=new AbortController();ctrl.push(c);const tm=setTimeout(()=>c.abort(),40000),t0=Date.now(),h={'Content-Type':'application/json'};if(p.key)h.Authorization='Bearer '+p.key;
 try{const r=await fetch(p.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:c.signal,headers:h,body:JSON.stringify({model:k.slice(i+1),messages:msgs,max_tokens:mt||1500})});
-if(!r.ok)throw r.status;const x=((await r.json()).choices?.[0]?.message?.content||'').trim();if(!x)throw'x';note(k,1,Date.now()-t0);return x}
+if(!r.ok)throw r.status;const z=await r.json(),v=z.choices?.[0]?.message?.content;const x=(Array.isArray(v)?v.map(x=>x?.text||'').join(''):v||'').trim();if(!x)throw'empty';note(k,1,Date.now()-t0);return x}
 catch(e){note(k,0,0,e);throw e}finally{clearTimeout(tm)}}
-async function work(Q,m){for(let n=0;n<3&&Q.length&&!halt;n++){const k=Q.shift();try{return{k,x:await ask(k,m)}}catch{}}return null}
 async function fin(ch,ti,f,Q,u){const t=ch.turns[ti];f.try=1;
 for(let n=0;n<4&&Q.length&&!halt;n++){const k=Q.shift();f.k=k;f.c='';delete f.err;delete f.to;const t0=Date.now();await run(ch,ti,t.a.indexOf(f),u);
 if(f.c&&!f.err&&!f.to&&!halt){note(k,1,Date.now()-t0);f.m='Answer · '+label(k).split(' · ')[0];delete f.try;return true}
 note(k,0,0,parseInt(f.err)||'x')}
 delete f.try;if(!halt){f.c='';f.err='All models are busy right now. Please wait a minute and try again.'}return false}
-async function auto(ch,ti){const t=ch.turns[ti],q=t.u,Q=pool(),f={k:'',m:'Working…',c:'',kind:'final',try:1};t.a.push(f);render();
-const end=()=>{delete f.try;render()};
-if(!Q.length){f.err='Add a provider with an API key in Settings first.';return end()}
-const hard=q.length>120||/\b(code|debug|explain|why|compare|plan|analy[sz]e|write|essay|calculate|solve|step|research|difference)\b/i.test(q);
-if(!hard||Q.length<3){await fin(ch,ti,f,Q);return end()}
-const m=[...hist(ch,ti,''),{role:'user',content:q}];f.m='Models are drafting…';render();
-const d=(await Promise.all([0,1,2].map(()=>work(Q,m)))).filter(Boolean);if(halt)return end();
-if(d.length<2){if(d[0]){f.c=d[0].x;f.m='Answer';return end()}await fin(ch,ti,f,Q);return end()}
-const L=d.map(x=>x.x),agree=L.every((a,i)=>L.every((b,j)=>j<=i||sim(a,b)>.5)),best=L.reduce((a,b)=>b.length>a.length?b:a);
-let det='**Drafts**\n'+d.map(x=>'**'+label(x.k)+'**\n'+x.x).join('\n\n');
-if(agree){f.c=best;f.m='Answer · '+d.length+' models agreed';f.det=det;return end()}
-f.m='Models are cross-checking…';render();
-const qq=`Question:\n${q}\n\n`+L.map((x,i)=>`Answer ${String.fromCharCode(65+i)}:\n${x}`).join('\n\n')+'\n\n';
-const rv=(await Promise.all(d.slice(0,2).map(x=>ask(x.k,[{role:'user',content:qq+'Fact-check every answer: list errors, weak reasoning and missing points, and say which parts you trust. Be concise.'}],700).catch(()=>'')))).filter(Boolean);
-if(halt)return end();
-det+='\n\n**Reviews**\n'+rv.join('\n---\n');f.m='Writing the final answer…';render();
-const J=d.map(x=>x.k).sort((a,b)=>sc(a)-sc(b));
-if(await fin(ch,ti,f,[...J,...Q],qq+'Reviews:\n'+rv.join('\n---\n')+'\n\nWrite the best final answer. Combine the strongest points, fix every error the reviews found, and say plainly where the models disagreed or what is uncertain. Do not mention answer letters or reviewers.')){f.m='Answer · '+d.length+' models'}
-else{delete f.err;f.c=best;f.m='Answer'}
-f.det=det;end()}
-async function af(){for(const p of S.prov){if(!p.url||(p.f&&Date.now()-p.f<864e5))continue;try{const r=await fetch(p.url.replace(/\/$/,'')+'/models',{headers:p.key?{Authorization:'Bearer '+p.key}:{}});if(!r.ok)continue;const j=await r.json();let ids=(j.data||j.models||[]).map(x=>(x.id||x.name||'').replace(/^models\//,'')).filter(Boolean);if(/openrouter/.test(p.url))ids=ids.filter(i=>i.endsWith(':free'));ids=ids.filter(i=>!/embed|whisper|tts|guard|moderat|image|rerank|audio/i.test(i));if(ids.length){p.models=[...new Set([...models(p),...ids])].join(', ');p.f=Date.now()}}catch{}}save()}
+function classify(q,img){
+ const s=q.toLowerCase(),marks=(q.match(/[?;]|\b(?:and also|as well as|then|first|second|finally)\b/gi)||[]).length;
+ let type=img?'vision':/```|\b(code|bug|debug|javascript|python|html|css|api|function|program|app)\b/i.test(q)?'code':/\b(calculate|equation|math|probability|percentage|solve)\b/i.test(q)?'math':/\b(compare|versus|vs\.?|choose|recommend|best)\b/i.test(q)?'decision':/\b(research|latest|current|today|news|price|source|evidence|fact)\b/i.test(q)?'research':/\b(plan|strategy|design|architect|analy[sz]e|evaluate)\b/i.test(q)?'reasoning':'general';
+ const risk=/\b(medical|medicine|dose|diagnos|legal|lawyer|contract|financial|invest|tax|safety|emergency|latest|current|today|news|price)\b/i.test(s);
+ const complex=!img&&(q.length>260||marks>2||(['code','decision','research','reasoning','math'].includes(type)&&q.length>110));
+ return{type,risk,complex}
+}
+function taskPlan(c){
+ const plans={
+  code:[['implementation','Produce a correct, minimal solution that satisfies every requirement.','code'],['reliability','Find edge cases, security risks, mobile issues and resource waste; propose precise fixes.','code'],['validation','Check the proposed approach for logical or syntax problems and missing requirements.','reasoning']],
+  math:[['solution','Solve independently and show the essential reasoning or calculations.','math'],['check','Verify assumptions, units, arithmetic and edge cases independently.','math']],
+  decision:[['comparison','Compare the options using explicit criteria and available evidence.','research'],['tradeoffs','Identify costs, risks, limitations and who each option suits.','reasoning'],['recommendation','Derive a practical recommendation from the stated constraints.','decision']],
+  research:[['evidence','Extract the most relevant facts; separate known information from anything that needs live verification.','research'],['analysis','Explain implications, alternatives and important context without inventing sources.','reasoning'],['caveats','Look for uncertainty, outdated claims, contradictions and missing evidence.','research']],
+  reasoning:[['analysis','Break down the requirements and develop a practical solution.','reasoning'],['critique','Challenge assumptions, identify failure modes and suggest improvements.','reasoning'],['execution','Turn the sound conclusions into clear actionable steps.','general']]
+ };
+ return(plans[c.type]||[['answer','Answer accurately and directly.','general']]).slice(0,S.saver?1:3).map(x=>({name:x[0],focus:x[1],type:x[2]}))
+}
+const bias=(k,type)=>{const n=k.toLowerCase();let b=0;if(type=='code'&&/coder|codestral|devstral|deepseek|qwen/.test(n))b-=1.1;if(type=='math'&&/reason|math|deepseek|qwen|r1/.test(n))b-=.8;if(type=='research'&&/gemini|claude|gpt|sonar/.test(n))b-=.5;return b};
+const taskPool=(base,type,turn=0)=>{const a=[...base].sort((x,y)=>sc(x)+bias(x,type)-sc(y)-bias(y,type)),n=Math.min(a.length,3);if(n&&turn){const r=turn%n;a.push(...a.splice(0,r))}return a};
+const usable=x=>typeof x=='string'&&x.trim().length>24&&!/^\s*(error|unable to (?:answer|help)|null|undefined)\b/i.test(x);
+async function doTask(task,idx,base,msgs,q){const P=taskPool(base,task.type,idx),prompt=`Original request:\n${q}\n\nYour assigned task (${task.name}): ${task.focus}\nReturn concise factual findings for another model to synthesize. Cover only this task. Never invent a citation, test result, current fact or capability. Clearly label uncertainty and information that requires live verification.`;
+ for(let n=0;n<3&&P.length&&!halt;n++){const k=P.shift();try{const x=await ask(k,[...msgs,{role:'user',content:prompt}],S.saver?450:700);if(usable(x))return{k,x,task}}catch{}}return null}
+async function auto(ch,ti){const t=ch.turns[ti],q=t.u,base=pool().filter(k=>!t.img||canVision(k)),f={k:'',m:'Working…',c:'',kind:'final',try:1};t.a.push(f);render();
+ const end=()=>{delete f.try;delete f.det;render()};
+ if(!base.length){f.err=t.img?'No configured model reports image support. Add Gemini or refresh your provider models.':'No working model is configured. Add a provider and API key in Settings.';return end()}
+ const c=classify(q,t.img);
+ // Images and ordinary questions take the cheapest reliable path: one model with automatic fallback.
+ if(!c.complex){if(await fin(ch,ti,f,taskPool(base,c.type))){f.m='Answer';if(!usable(f.c)){f.c='';f.err='The model returned an unusable answer. Please try again.'}}return end()}
+ f.m='Working…';render();const plan=taskPlan(c),context=hist(ch,ti,''),jobs=plan.map((x,i)=>doTask(x,i,base,context,q)),parts=(await Promise.all(jobs)).filter(Boolean);if(halt)return end();
+ if(!parts.length){await fin(ch,ti,f,[...base]);if(f.c)f.m='Answer';return end()}
+ const packet=parts.map((x,i)=>`Finding ${i+1} — ${x.task.name}:\n${x.x}`).join('\n\n');let review='';
+ // Verification is selective: reserve the extra request for high-risk or time-sensitive subjects.
+ if(c.risk&&!S.saver){const used=new Set(parts.map(x=>x.k)),vp=taskPool(base.filter(k=>!used.has(k)),'research');const k=vp[0]||taskPool(base,'research')[0];if(k)try{review=await ask(k,[{role:'user',content:`Original request:\n${q}\n\nCandidate findings:\n${packet}\n\nAudit only for contradictions, unsafe advice, unsupported certainty, fabricated citations, and facts that require current live data. Give concise corrections. If current information cannot be verified, require the final answer to say so.`}],450)}catch{}}
+ f.m='Writing answer…';render();const synth=`Original request:\n${q}\n\nSpecialist findings:\n${packet}${review?'\n\nReliability audit:\n'+review:''}\n\nWrite one direct, self-contained final answer to the original request. Use the strongest supported findings, resolve conflicts conservatively, and omit internal task discussion. Do not claim that something was tested, searched, or verified unless the findings prove it. Never fabricate citations. State important uncertainty and limitations plainly. Preserve the user’s requested format.`;
+ const order=[...new Set([...parts.map(x=>x.k).sort((a,b)=>sc(a)-sc(b)),...taskPool(base,'general')])];
+ if(await fin(ch,ti,f,order,synth)){f.m='Answer';if(!usable(f.c)){f.c='';f.err='The models did not produce a reliable answer. Please try again.'}}
+ else{const best=parts.sort((a,b)=>b.x.length-a.x.length)[0];delete f.err;f.c=best.x;f.m='Answer'}end()}
+async function af(){for(const p of S.prov){if(!p.url||(p.f&&Date.now()-p.f<864e5))continue;try{const r=await fetch(p.url.replace(/\/$/,'')+'/models',{headers:p.key?{Authorization:'Bearer '+p.key}:{}});if(!r.ok)continue;const j=await r.json(),raw=j.data||j.models||[];let ids=raw.map(x=>(x.id||x.name||'').replace(/^models\//,'')).filter(Boolean);p.vis=raw.filter(x=>{const a=x.architecture||{},ins=a.input_modalities||[];return ins.includes('image')||/image/i.test(a.modality||'')}).map(x=>(x.id||x.name||'').replace(/^models\//,''));if(/openrouter/.test(p.url))ids=ids.filter(i=>i.endsWith(':free')||i=='openrouter/free');ids=ids.filter(i=>!/embed|whisper|tts|guard|moderat|image|rerank|audio/i.test(i));if(ids.length){p.models=[...new Set([...models(p),...ids])].join(', ');p.f=Date.now()}}catch{}}save()}
 async function team(ch,ti){const t=ch.turns[ti],d=t.a.filter(a=>!a.kind&&a.c&&!a.err);if(d.length<2||halt)return;
 const blk=d.map((a,i)=>`Answer ${String.fromCharCode(65+i)}:\n${a.c}`).join('\n\n'),q=`Question:\n${t.u}\n\n${blk}\n\n`;
 const rv=d.map(a=>({k:a.k,m:'Review · '+a.m,c:'',kind:'review'}));t.a.push(...rv);render();
 await Promise.all(rv.map(a=>run(ch,ti,t.a.indexOf(a),q+'Review every answer as a strict fact-checker: list errors, weak reasoning and missing points, and say which parts you trust. Do not assume any answer is right. Be concise.')));
 if(halt)return;t.a.push({k:S.sel[0],m:'Final answer · '+label(S.sel[0]),c:'',kind:'final'});render();
 await run(ch,ti,t.a.length-1,q+'Reviews:\n'+rv.map(a=>a.c).join('\n---\n')+'\n\nWrite the best final answer to the question. Combine the strongest points, fix every error the reviews found, and say plainly where the models disagreed and what remains uncertain. Do not mention answer letters or reviewers.')}
-async function send(){const ta=$('#in'),text=ta.value.trim();if(!text||busy)return;
+async function send(){const ta=$('#in'),text=ta.value.trim()||(pend?'Describe this image.':'');if(!text||busy)return;
 if(!S.auto&&!S.sel.length){toast('Pick a model first');rm();$('#dm').showModal();return}
-const ch=chat,turn={u:text,a:S.auto?[]:S.sel.map(k=>({k,m:label(k),c:''}))};ch.turns.push(turn);if(ch.turns.length==1)ch.title=text.slice(0,40);
-ta.value='';grow();render();busy=true;$('#go').textContent='Stop';
+const ch=chat,turn={u:text,img:pend||undefined,a:S.auto?[]:S.sel.map(k=>({k,m:label(k),c:''}))};ch.turns.push(turn);if(ch.turns.length==1)ch.title=text.slice(0,40);
+ta.value='';grow();setImg('');render();busy=true;$('#go').textContent='Stop';
 halt=false;if(S.auto)await auto(ch,ch.turns.length-1);else{await Promise.all(turn.a.map((_,j)=>run(ch,ch.turns.length-1,j)));if(S.team&&!halt)await team(ch,ch.turns.length-1)}
 busy=false;ctrl=[];$('#go').textContent='Send';ch.t=Date.now();await chatPut(ch)}
 const grow=()=>{const t=$('#in');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
-$('#in').oninput=grow;$('#go').onclick=()=>busy?(halt=true,ctrl.forEach(c=>c.abort())):send();
+function meta(){const n=$('#in').value.length,s=pend?' · image '+Math.ceil(dataBytes(pend)/1024)+' KB':'';$('#meta').textContent=(n?`${n.toLocaleString()} / 20,000`:'')+s}
+function scrollState(){const m=$('#msgs'),far=m.scrollHeight-m.scrollTop-m.clientHeight>220;$('#down').style.display=far?'block':'none'}
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch{const x=document.createElement('textarea');x.value=t;x.style.position='fixed';x.style.opacity=0;document.body.append(x);x.select();document.execCommand('copy');x.remove()}toast('Copied')}
+$('#in').oninput=()=>{grow();meta()};$('#in').onkeydown=e=>{if(e.key=='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();busy?toast('Wait for the current answer or tap Stop'):send()}};
+$('#at').onclick=()=>$('#fl').click();$('#fl').onchange=e=>{pick(e.target.files[0]);e.target.value=''};$('#mic').onclick=mic;$('#pv').onclick=e=>{if(e.target.id=='rm2')setImg('');else if(e.target.tagName=='IMG'){$('#ivi').src=e.target.src;$('#iv').showModal()}};
+$('#msgs').onscroll=scrollState;$('#down').onclick=()=>{$('#msgs').scrollTo({top:$('#msgs').scrollHeight,behavior:'smooth'})};
+$('#in').addEventListener('paste',e=>{const f=[...e.clipboardData.items].find(x=>x.type.startsWith('image/'))?.getAsFile();if(f){e.preventDefault();pick(f)}});
+for(const ev of ['dragenter','dragover'])document.body.addEventListener(ev,e=>{e.preventDefault();document.body.classList.add('drag')});for(const ev of ['dragleave','drop'])document.body.addEventListener(ev,e=>{e.preventDefault();document.body.classList.remove('drag');if(ev=='drop'){const f=[...e.dataTransfer.files].find(x=>x.type.startsWith('image/'));if(f)pick(f)}});
+$('#th').onchange=e=>{S.th=e.target.value;kvSet('th',S.th);document.documentElement.dataset.th=S.th;document.querySelector('meta[name="theme-color"]').content=S.th=='dark'?'#0e1a21':'#0f766e'};$('#lg').onchange=e=>{S.lang=e.target.value;kvSet('lang',S.lang)};$('#ti').onclick=()=>{const n=prompt('Rename chat',chat.title);if(n&&n.trim()){chat.title=n.trim().slice(0,60);$('#ti').textContent=chat.title;if(chat.turns.length)chatPut(chat)}};$('#go').onclick=()=>busy?(halt=true,ctrl.forEach(c=>c.abort()),toast('Stopping…')):send();
 document.addEventListener('click',e=>{if(e.target.classList.contains('x'))e.target.closest('dialog').close()});
-$('#msgs').onclick=e=>{if(e.target.dataset.cp===undefined)return;const d=e.target.closest('.a').dataset;navigator.clipboard.writeText(chat.turns[d.t].a[d.j].c).then(()=>toast('Copied'))};
+$('#msgs').onclick=e=>{if(e.target.dataset.del!==undefined){if(!busy&&confirm('Delete this question and its answers?')){chat.turns.splice(+e.target.dataset.del,1);chatPut(chat);render()}return}const D=e.target.dataset,tl=chat.turns.length-1;
+if(D.sg){$('#in').value=D.sg+': ';$('#in').focus();grow();return}
+if(D.cc!==undefined){copyText(e.target.closest('.cb').querySelector('code').textContent);return}
+if(D.cq!==undefined){copyText(chat.turns[D.cq].u);return}
+if(D.ed!==undefined&&!busy){const u=chat.turns[tl].u;setImg(chat.turns[tl].img||'');chat.turns.pop();chatPut(chat);render();$('#in').value=u;grow();$('#in').focus();return}
+if(D.rg!==undefined&&!busy){const u=chat.turns[tl].u;setImg(chat.turns[tl].img||'');chat.turns.pop();chatPut(chat);render();$('#in').value=u;send();return}
+if(e.target.dataset.cp===undefined)return;const d=e.target.closest('.a').dataset;copyText(chat.turns[d.t].a[d.j].c)};
 function rm(){$('#ml').innerHTML=S.prov.map(p=>`<b>${esc(p.name)}</b>`+models(p).map(m=>{const k=p.id+'|'+m;return `<label class="ck"><input type="checkbox" value="${esc(k)}" ${S.sel.includes(k)?'checked':''}>${esc(m)}</label>`}).join('')).join('')||'<p>Add a provider in Settings first.</p>'}
 $('#ml').onchange=()=>{S.sel=[...document.querySelectorAll('#ml input:checked')].map(i=>i.value);kvSet('sel',S.sel);lab()};
 $('#bm').onclick=()=>{rm();$('#au').checked=S.auto;$('#tm').checked=!!S.team;$('#dm').showModal()};$('#tm').onchange=e=>{S.team=e.target.checked;kvSet('team',S.team)};$('#au').onchange=e=>{S.auto=e.target.checked;kvSet('auto',S.auto);lab()};
@@ -135,15 +234,18 @@ function rp(){$('#pl').innerHTML=S.prov.map((p,i)=>`<div class="card"><input dat
 $('#pl').oninput=e=>{const t=e.target;if(t.dataset.f){S.prov[t.dataset.i][t.dataset.f]=t.value;if(t.dataset.f=='key'||t.dataset.f=='url'){const id=S.prov[t.dataset.i].id;for(const k in S.h)if(k.startsWith(id+'|'))delete S.h[k]}save()}};
 $('#pl').onclick=async e=>{const d=e.target.dataset;
 if(d.rm!==undefined&&confirm('Remove this provider?')){S.prov.splice(d.rm,1);S.sel=S.sel.filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));await save();kvSet('sel',S.sel);rp();lab()}
-if(d.fe!==undefined){const p=S.prov[d.fe];try{const r=await fetch(p.url.replace(/\/$/,'')+'/models',{headers:p.key?{Authorization:'Bearer '+p.key}:{}});if(!r.ok)throw new Error(r.status);const j=await r.json();let ids=(j.data||j.models||[]).map(x=>(x.id||x.name).replace(/^models\//,''));if(/openrouter/.test(p.url))ids=ids.filter(i=>i.endsWith(':free'));p.models=ids.join(', ');await save();rp();toast(ids.length+' models found')}catch(x){toast('Could not fetch: '+x.message)}}};
+if(d.fe!==undefined){const p=S.prov[d.fe];try{const r=await fetch(p.url.replace(/\/$/,'')+'/models',{headers:p.key?{Authorization:'Bearer '+p.key}:{}});if(!r.ok)throw new Error(r.status);const j=await r.json(),raw=j.data||j.models||[];let ids=raw.map(x=>(x.id||x.name||'').replace(/^models\//,'')).filter(Boolean);p.vis=raw.filter(x=>{const a=x.architecture||{},ins=a.input_modalities||[];return ins.includes('image')||/image/i.test(a.modality||'')}).map(x=>(x.id||x.name||'').replace(/^models\//,''));if(/openrouter/.test(p.url))ids=ids.filter(i=>i.endsWith(':free')||i=='openrouter/free');ids=ids.filter(i=>!/embed|whisper|tts|guard|moderat|image|rerank|audio/i.test(i));p.models=ids.join(', ');p.f=Date.now();await save();rp();toast(ids.length+' chat models found')}catch(x){toast('Could not fetch: '+x.message)}}};
 $('#pp').innerHTML=Object.keys(PRE).map(n=>`<option>${n}</option>`).join('');
 $('#ap').onclick=()=>{const n=$('#pp').value;S.prov.push({id:Date.now().toString(36),name:n,url:PRE[n][0],key:'',models:PRE[n][1]});save();rp()};
-$('#bs').onclick=()=>{rp();$('#sy').value=chat.sys||'';navigator.storage?.estimate?.().then(e=>$('#st').textContent='Storage used: '+(e.usage/1048576).toFixed(1)+' MB of about '+(e.quota/1073741824).toFixed(1)+' GB');$('#ds').showModal()};
+const storageInfo=()=>navigator.storage?.estimate?.().then(e=>$('#st').textContent='Storage used: '+(e.usage/1048576).toFixed(1)+' MB of about '+(e.quota/1073741824).toFixed(1)+' GB');
+$('#bs').onclick=()=>{rp();$('#th').value=S.th||'';$('#lg').value=S.lang||'';$('#dsav').checked=!!S.saver;$('#sy').value=chat.sys||'';storageInfo();$('#ds').showModal()};
+$('#dsav').onchange=e=>{S.saver=e.target.checked;kvSet('saver',S.saver);toast(S.saver?'Data saver on':'Data saver off')};
+$('#ci').onclick=async()=>{if(!confirm('Remove saved photos from every chat? Message text and answers will stay.'))return;const all=await chatAll();for(const c of all){let changed=false;for(const t of c.turns)if(t.img){delete t.img;changed=true}if(changed)await chatPut(c)}setImg('');chat=await chatGet(chat.id)||chat;render();storageInfo();toast('Saved images cleared')};
 $('#sy').oninput=e=>{chat.sys=e.target.value;if(chat.turns.length)chatPut(chat)};
 $('#ex').onclick=async()=>{const k=confirm('Include API keys in the backup file?\nOK = include, Cancel = leave out');const d={v:1,prov:S.prov.map(p=>k?p:{...p,key:''}),chats:await chatAll()},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));a.download='ai-hub-backup.json';a.click()};
 $('#im').onclick=()=>$('#fi').click();
 $('#fi').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const c of d.chats||[])await chatPut(c);for(const p of d.prov||[]){const x=S.prov.find(z=>z.id==p.id);if(!x)S.prov.push(p);else if(!x.key&&p.key)x.key=p.key}await save();rp();toast('Imported')}catch{toast('Not a valid backup file')}};
-(async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.team=!!(await kvGet('team'));S.auto=(await kvGet('auto'))!==false;S.h=(await kvGet('health'))||{};S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
+(async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.team=!!(await kvGet('team'));S.auto=(await kvGet('auto'))!==false;S.th=(await kvGet('th'))||'';S.lang=(await kvGet('lang'))||'';S.saver=!!(await kvGet('saver'));document.documentElement.dataset.th=S.th;S.h=(await kvGet('health'))||{};S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
 const all=(await chatAll()).sort((a,b)=>b.t-a.t);chat=all[0]||newChat();navigator.storage?.persist?.();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');af();lab();render();
 if(!S.prov.length){rp();$('#ds').showModal()}})();
 </script></body></html>
