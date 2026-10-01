@@ -35,7 +35,7 @@ dialog::backdrop{background:#0009}dialog h3{margin:14px 0 6px}
 <div id="msgs"></div>
 <footer><textarea id="in" rows="1" placeholder="Message"></textarea><button class="p" id="go">Send</button></footer>
 <dialog id="dc"><div class="r"><input id="q" placeholder="Search chats"><button class="p" id="nc">New</button></div><div id="cl"></div><button class="x">Close</button></dialog>
-<dialog id="dm"><h3>Models</h3><p class="mu">Tick several to ask all of them at once.</p><div id="ml"></div><label class="ck"><input type="checkbox" id="tm">Team mode: models answer, review each other, then the first ticked model writes one final answer</label><button class="p x">Done</button></dialog>
+<dialog id="dm"><h3>Models</h3><p class="mu">Tick several to ask all of them at once.</p><div id="ml"></div><label class="ck"><input type="checkbox" id="au">Auto mode (recommended): the app picks working models, they check each other, and you see one final answer. Untick to choose models yourself.</label><label class="ck"><input type="checkbox" id="tm">Team mode: models answer, review each other, then the first ticked model writes one final answer</label><button class="p x">Done</button></dialog>
 <dialog id="ds"><h3>Providers</h3><div id="pl"></div><div class="r"><select id="pp"></select><button id="ap">Add</button></div>
 <h3>System prompt for this chat</h3><textarea id="sy" rows="3" placeholder="Optional instructions for the AI"></textarea>
 <h3>Backup</h3><div class="r"><button id="ex">Export</button><button id="im">Import</button></div><p id="st" class="mu"></p>
@@ -54,23 +54,60 @@ const save=()=>kvSet('prov',S.prov);
 const models=p=>(p.models||'').split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
 const newChat=()=>chat={id:Date.now()+'',title:'New chat',t:Date.now(),sys:'',turns:[]};
 const label=k=>{const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));return k.slice(i+1).split('/').pop().replace(':free','')+' · '+(p?p.name:'?')};
-function lab(){$('#bm').textContent=S.sel.length>1?S.sel.length+' models':S.sel.length?label(S.sel[0]).split(' · ')[0]:'Pick model'}
+function lab(){if(S.auto){$('#bm').textContent='Auto';return}$('#bm').textContent=S.sel.length>1?S.sel.length+' models':S.sel.length?label(S.sel[0]).split(' · ')[0]:'Pick model'}
 function md(t){return t.split('```').map((p,i)=>{if(i%2){const n=p.indexOf('\n');return '<pre><code>'+esc(p.slice(n+1))+'</code></pre>'}return esc(p).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}).join('')}
-const body=a=>md(a.c)+(a.err?'<i class="er">Error: '+esc(a.err)+'</i>':'');
+const body=a=>md(a.c)+(a.err&&!a.try?'<i class="er">Error: '+esc(a.err)+'</i>':'')+(a.det?'<details><summary class="mu">How the models worked</summary>'+md(a.det)+'</details>':'');
 function render(){$('#ti').textContent=chat.title;$('#msgs').innerHTML=chat.turns.map((t,i)=>`<div class="u">${esc(t.u)}</div>`+t.a.map((a,j)=>`<div class="a${a.kind=='final'?' f':a.kind?' rv':''}" data-t="${i}" data-j="${j}"><small>${esc(a.m)} · <u data-cp>copy</u></small><div class="b">${body(a)}</div></div>`).join('')).join('')||'<p class="mu" style="text-align:center;margin-top:28vh">Pick one or more models, then ask anything.</p>';$('#msgs').scrollTop=1e9}
 function paint(ch,ti,j){if(chat!==ch)return;const b=document.querySelector(`[data-t="${ti}"][data-j="${j}"] .b`),m=$('#msgs'),n=m.scrollHeight-m.scrollTop-m.clientHeight<160;if(b)b.innerHTML=body(ch.turns[ti].a[j]);if(n)m.scrollTop=1e9}
-function hist(ch,ti,k){const m=ch.sys?[{role:'system',content:ch.sys}]:[];ch.turns.slice(0,ti).forEach(t=>{m.push({role:'user',content:t.u});const x=t.a.find(z=>z.kind=='final'&&z.c)||t.a.find(z=>z.k==k&&!z.kind&&z.c)||t.a.find(z=>!z.kind&&z.c);if(x)m.push({role:'assistant',content:x.c})});return m}
+function hist(ch,ti,k){const m=ch.sys?[{role:'system',content:ch.sys}]:[];ch.turns.slice(Math.max(0,ti-6),ti).forEach(t=>{m.push({role:'user',content:t.u});const x=t.a.find(z=>z.kind=='final'&&z.c)||t.a.find(z=>z.k==k&&!z.kind&&z.c)||t.a.find(z=>!z.kind&&z.c);if(x)m.push({role:'assistant',content:x.c})});return m}
 async function run(ch,ti,j,u){const a=ch.turns[ti].a[j],i=a.k.indexOf('|'),p=S.prov.find(x=>x.id==a.k.slice(0,i)),model=a.k.slice(i+1);
 if(!p){a.err='Provider was removed';return}
-const c=new AbortController();ctrl.push(c);const msgs=[...hist(ch,ti,a.k),{role:'user',content:u||ch.turns[ti].u}];
+const c=new AbortController();ctrl.push(c);let tm;const st=ms=>{clearTimeout(tm);tm=setTimeout(()=>{a.to=1;c.abort()},ms)};st(40000);const msgs=[...hist(ch,ti,a.k),{role:'user',content:u||ch.turns[ti].u}];
 try{const h={'Content-Type':'application/json'};if(p.key)h.Authorization='Bearer '+p.key;
 const r=await fetch(p.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:c.signal,headers:h,body:JSON.stringify({model,messages:msgs,stream:true})});
 if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,200));
 const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
-for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();
+for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});st(25000);const ls=buf.split('\n');buf=ls.pop();
 for(const l of ls){if(!l.startsWith('data:'))continue;const d=l.slice(5).trim();if(d=='[DONE]')continue;try{a.c+=JSON.parse(d).choices?.[0]?.delta?.content||''}catch{}}paint(ch,ti,j)}
 }catch(e){if(e.name=='AbortError')a.c+=a.c?'':'(stopped)';else a.err=e.message}
-paint(ch,ti,j)}
+clearTimeout(tm);paint(ch,ti,j)}
+const W=s=>new Set(s.toLowerCase().match(/\w{4,}/g)||[]),sim=(a,b)=>{const x=W(a),y=W(b);let i=0;x.forEach(w=>y.has(w)&&i++);return i/(x.size+y.size-i||1)};
+function note(k,ok,ms,e){if(halt)return;const h=S.h[k]||(S.h[k]={ok:0,f:0,ms:0,u:0});if(ok){h.ok++;h.f=0;h.u=0;h.ms=h.ms?h.ms*.7+ms*.3:ms}else{h.f++;h.u=Date.now()+(e==403||e==404?864e5:e==401?36e5:Math.min((e==429?6e4:12e4)*h.f,18e5))}kvSet('health',S.h)}
+const sc=k=>{const h=S.h[k]||{};return -Math.min(h.ok||0,5)+(h.ms||0)/8000+(h.f||0)*2};
+function pool(){const all=S.prov.flatMap(p=>models(p).map(m=>p.id+'|'+m)),n=Date.now();let o=all.filter(k=>!(S.h[k]&&S.h[k].u>n));if(!o.length)o=all;
+o=o.map(k=>[k,sc(k)+Math.random()*1.5]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);const s={},a=[],b=[];o.forEach(k=>{const p=k.split('|')[0];s[p]?b.push(k):(s[p]=1,a.push(k))});return[...a,...b]}
+async function ask(k,msgs,mt){const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));if(!p)throw 0;
+const c=new AbortController();ctrl.push(c);const tm=setTimeout(()=>c.abort(),40000),t0=Date.now(),h={'Content-Type':'application/json'};if(p.key)h.Authorization='Bearer '+p.key;
+try{const r=await fetch(p.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:c.signal,headers:h,body:JSON.stringify({model:k.slice(i+1),messages:msgs,max_tokens:mt||1500})});
+if(!r.ok)throw r.status;const x=((await r.json()).choices?.[0]?.message?.content||'').trim();if(!x)throw'x';note(k,1,Date.now()-t0);return x}
+catch(e){note(k,0,0,e);throw e}finally{clearTimeout(tm)}}
+async function work(Q,m){for(let n=0;n<3&&Q.length&&!halt;n++){const k=Q.shift();try{return{k,x:await ask(k,m)}}catch{}}return null}
+async function fin(ch,ti,f,Q,u){const t=ch.turns[ti];f.try=1;
+for(let n=0;n<4&&Q.length&&!halt;n++){const k=Q.shift();f.k=k;f.c='';delete f.err;delete f.to;const t0=Date.now();await run(ch,ti,t.a.indexOf(f),u);
+if(f.c&&!f.err&&!f.to&&!halt){note(k,1,Date.now()-t0);f.m='Answer · '+label(k).split(' · ')[0];delete f.try;return true}
+note(k,0,0,parseInt(f.err)||'x')}
+delete f.try;if(!halt){f.c='';f.err='All models are busy right now. Please wait a minute and try again.'}return false}
+async function auto(ch,ti){const t=ch.turns[ti],q=t.u,Q=pool(),f={k:'',m:'Working…',c:'',kind:'final',try:1};t.a.push(f);render();
+const end=()=>{delete f.try;render()};
+if(!Q.length){f.err='Add a provider with an API key in Settings first.';return end()}
+const hard=q.length>120||/\b(code|debug|explain|why|compare|plan|analy[sz]e|write|essay|calculate|solve|step|research|difference)\b/i.test(q);
+if(!hard||Q.length<3){await fin(ch,ti,f,Q);return end()}
+const m=[...hist(ch,ti,''),{role:'user',content:q}];f.m='Models are drafting…';render();
+const d=(await Promise.all([0,1,2].map(()=>work(Q,m)))).filter(Boolean);if(halt)return end();
+if(d.length<2){if(d[0]){f.c=d[0].x;f.m='Answer';return end()}await fin(ch,ti,f,Q);return end()}
+const L=d.map(x=>x.x),agree=L.every((a,i)=>L.every((b,j)=>j<=i||sim(a,b)>.5)),best=L.reduce((a,b)=>b.length>a.length?b:a);
+let det='**Drafts**\n'+d.map(x=>'**'+label(x.k)+'**\n'+x.x).join('\n\n');
+if(agree){f.c=best;f.m='Answer · '+d.length+' models agreed';f.det=det;return end()}
+f.m='Models are cross-checking…';render();
+const qq=`Question:\n${q}\n\n`+L.map((x,i)=>`Answer ${String.fromCharCode(65+i)}:\n${x}`).join('\n\n')+'\n\n';
+const rv=(await Promise.all(d.slice(0,2).map(x=>ask(x.k,[{role:'user',content:qq+'Fact-check every answer: list errors, weak reasoning and missing points, and say which parts you trust. Be concise.'}],700).catch(()=>'')))).filter(Boolean);
+if(halt)return end();
+det+='\n\n**Reviews**\n'+rv.join('\n---\n');f.m='Writing the final answer…';render();
+const J=d.map(x=>x.k).sort((a,b)=>sc(a)-sc(b));
+if(await fin(ch,ti,f,[...J,...Q],qq+'Reviews:\n'+rv.join('\n---\n')+'\n\nWrite the best final answer. Combine the strongest points, fix every error the reviews found, and say plainly where the models disagreed or what is uncertain. Do not mention answer letters or reviewers.')){f.m='Answer · '+d.length+' models'}
+else{delete f.err;f.c=best;f.m='Answer'}
+f.det=det;end()}
+async function af(){for(const p of S.prov){if(!p.url||(p.f&&Date.now()-p.f<864e5))continue;try{const r=await fetch(p.url.replace(/\/$/,'')+'/models',{headers:p.key?{Authorization:'Bearer '+p.key}:{}});if(!r.ok)continue;const j=await r.json();let ids=(j.data||j.models||[]).map(x=>(x.id||x.name||'').replace(/^models\//,'')).filter(Boolean);if(/openrouter/.test(p.url))ids=ids.filter(i=>i.endsWith(':free'));ids=ids.filter(i=>!/embed|whisper|tts|guard|moderat|image|rerank|audio/i.test(i));if(ids.length){p.models=[...new Set([...models(p),...ids])].join(', ');p.f=Date.now()}}catch{}}save()}
 async function team(ch,ti){const t=ch.turns[ti],d=t.a.filter(a=>!a.kind&&a.c&&!a.err);if(d.length<2||halt)return;
 const blk=d.map((a,i)=>`Answer ${String.fromCharCode(65+i)}:\n${a.c}`).join('\n\n'),q=`Question:\n${t.u}\n\n${blk}\n\n`;
 const rv=d.map(a=>({k:a.k,m:'Review · '+a.m,c:'',kind:'review'}));t.a.push(...rv);render();
@@ -78,10 +115,10 @@ await Promise.all(rv.map(a=>run(ch,ti,t.a.indexOf(a),q+'Review every answer as a
 if(halt)return;t.a.push({k:S.sel[0],m:'Final answer · '+label(S.sel[0]),c:'',kind:'final'});render();
 await run(ch,ti,t.a.length-1,q+'Reviews:\n'+rv.map(a=>a.c).join('\n---\n')+'\n\nWrite the best final answer to the question. Combine the strongest points, fix every error the reviews found, and say plainly where the models disagreed and what remains uncertain. Do not mention answer letters or reviewers.')}
 async function send(){const ta=$('#in'),text=ta.value.trim();if(!text||busy)return;
-if(!S.sel.length){toast('Pick a model first');rm();$('#dm').showModal();return}
-const ch=chat,turn={u:text,a:S.sel.map(k=>({k,m:label(k),c:''}))};ch.turns.push(turn);if(ch.turns.length==1)ch.title=text.slice(0,40);
+if(!S.auto&&!S.sel.length){toast('Pick a model first');rm();$('#dm').showModal();return}
+const ch=chat,turn={u:text,a:S.auto?[]:S.sel.map(k=>({k,m:label(k),c:''}))};ch.turns.push(turn);if(ch.turns.length==1)ch.title=text.slice(0,40);
 ta.value='';grow();render();busy=true;$('#go').textContent='Stop';
-halt=false;await Promise.all(turn.a.map((_,j)=>run(ch,ch.turns.length-1,j)));if(S.team&&!halt)await team(ch,ch.turns.length-1);
+halt=false;if(S.auto)await auto(ch,ch.turns.length-1);else{await Promise.all(turn.a.map((_,j)=>run(ch,ch.turns.length-1,j)));if(S.team&&!halt)await team(ch,ch.turns.length-1)}
 busy=false;ctrl=[];$('#go').textContent='Send';ch.t=Date.now();await chatPut(ch)}
 const grow=()=>{const t=$('#in');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
 $('#in').oninput=grow;$('#go').onclick=()=>busy?(halt=true,ctrl.forEach(c=>c.abort())):send();
@@ -89,13 +126,13 @@ document.addEventListener('click',e=>{if(e.target.classList.contains('x'))e.targ
 $('#msgs').onclick=e=>{if(e.target.dataset.cp===undefined)return;const d=e.target.closest('.a').dataset;navigator.clipboard.writeText(chat.turns[d.t].a[d.j].c).then(()=>toast('Copied'))};
 function rm(){$('#ml').innerHTML=S.prov.map(p=>`<b>${esc(p.name)}</b>`+models(p).map(m=>{const k=p.id+'|'+m;return `<label class="ck"><input type="checkbox" value="${esc(k)}" ${S.sel.includes(k)?'checked':''}>${esc(m)}</label>`}).join('')).join('')||'<p>Add a provider in Settings first.</p>'}
 $('#ml').onchange=()=>{S.sel=[...document.querySelectorAll('#ml input:checked')].map(i=>i.value);kvSet('sel',S.sel);lab()};
-$('#bm').onclick=()=>{rm();$('#tm').checked=!!S.team;$('#dm').showModal()};$('#tm').onchange=e=>{S.team=e.target.checked;kvSet('team',S.team)};
+$('#bm').onclick=()=>{rm();$('#au').checked=S.auto;$('#tm').checked=!!S.team;$('#dm').showModal()};$('#tm').onchange=e=>{S.team=e.target.checked;kvSet('team',S.team)};$('#au').onchange=e=>{S.auto=e.target.checked;kvSet('auto',S.auto);lab()};
 async function rc(){const q=$('#q').value.toLowerCase(),all=(await chatAll()).sort((a,b)=>b.t-a.t).filter(c=>!q||(c.title+JSON.stringify(c.turns)).toLowerCase().includes(q));$('#cl').innerHTML=all.map(c=>`<div class="row"><span data-o="${c.id}">${esc(c.title)}</span><button data-d="${c.id}">Delete</button></div>`).join('')||'<p class="mu">No chats yet.</p>'}
 $('#bc').onclick=()=>{rc();$('#dc').showModal()};$('#q').oninput=rc;
 $('#nc').onclick=()=>{newChat();render();$('#dc').close()};
 $('#cl').onclick=async e=>{const d=e.target.dataset;if(d.o){chat=await chatGet(d.o);render();$('#dc').close()}if(d.d&&confirm('Delete this chat?')){await chatDel(d.d);if(chat.id==d.d){newChat();render()}rc()}};
 function rp(){$('#pl').innerHTML=S.prov.map((p,i)=>`<div class="card"><input data-i="${i}" data-f="name" value="${esc(p.name)}" placeholder="Name"><input data-i="${i}" data-f="url" value="${esc(p.url)}" placeholder="Base URL"><input type="password" data-i="${i}" data-f="key" value="${esc(p.key)}" placeholder="API key"><textarea rows="2" data-i="${i}" data-f="models" placeholder="Model ids, comma separated">${esc(p.models)}</textarea><div class="r"><button data-fe="${i}">Fetch models</button><button data-rm="${i}">Remove</button></div></div>`).join('')}
-$('#pl').oninput=e=>{const t=e.target;if(t.dataset.f){S.prov[t.dataset.i][t.dataset.f]=t.value;save()}};
+$('#pl').oninput=e=>{const t=e.target;if(t.dataset.f){S.prov[t.dataset.i][t.dataset.f]=t.value;if(t.dataset.f=='key'||t.dataset.f=='url'){const id=S.prov[t.dataset.i].id;for(const k in S.h)if(k.startsWith(id+'|'))delete S.h[k]}save()}};
 $('#pl').onclick=async e=>{const d=e.target.dataset;
 if(d.rm!==undefined&&confirm('Remove this provider?')){S.prov.splice(d.rm,1);S.sel=S.sel.filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));await save();kvSet('sel',S.sel);rp();lab()}
 if(d.fe!==undefined){const p=S.prov[d.fe];try{const r=await fetch(p.url.replace(/\/$/,'')+'/models',{headers:p.key?{Authorization:'Bearer '+p.key}:{}});if(!r.ok)throw new Error(r.status);const j=await r.json();let ids=(j.data||j.models||[]).map(x=>(x.id||x.name).replace(/^models\//,''));if(/openrouter/.test(p.url))ids=ids.filter(i=>i.endsWith(':free'));p.models=ids.join(', ');await save();rp();toast(ids.length+' models found')}catch(x){toast('Could not fetch: '+x.message)}}};
@@ -106,7 +143,7 @@ $('#sy').oninput=e=>{chat.sys=e.target.value;if(chat.turns.length)chatPut(chat)}
 $('#ex').onclick=async()=>{const k=confirm('Include API keys in the backup file?\nOK = include, Cancel = leave out');const d={v:1,prov:S.prov.map(p=>k?p:{...p,key:''}),chats:await chatAll()},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));a.download='ai-hub-backup.json';a.click()};
 $('#im').onclick=()=>$('#fi').click();
 $('#fi').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const c of d.chats||[])await chatPut(c);for(const p of d.prov||[]){const x=S.prov.find(z=>z.id==p.id);if(!x)S.prov.push(p);else if(!x.key&&p.key)x.key=p.key}await save();rp();toast('Imported')}catch{toast('Not a valid backup file')}};
-(async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.team=!!(await kvGet('team'));S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
-const all=(await chatAll()).sort((a,b)=>b.t-a.t);chat=all[0]||newChat();navigator.storage?.persist?.();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');lab();render();
+(async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.team=!!(await kvGet('team'));S.auto=(await kvGet('auto'))!==false;S.h=(await kvGet('health'))||{};S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
+const all=(await chatAll()).sort((a,b)=>b.t-a.t);chat=all[0]||newChat();navigator.storage?.persist?.();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');af();lab();render();
 if(!S.prov.length){rp();$('#ds').showModal()}})();
 </script></body></html>
