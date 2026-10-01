@@ -90,7 +90,7 @@ const tx=(st,m,f)=>new Promise((ok,no)=>{const t=db.transaction(st,m),q=f(t.obje
 const kvGet=k=>tx('kv','readonly',s=>s.get(k)),kvSet=(k,v)=>tx('kv','readwrite',s=>s.put(v,k));
 const chatPut=c=>tx('chats','readwrite',s=>s.put(c)),chatDel=i=>tx('chats','readwrite',s=>s.delete(i)),chatGet=i=>tx('chats','readonly',s=>s.get(i)),chatAll=()=>tx('chats','readonly',s=>s.getAll());
 const save=()=>kvSet('prov',S.prov);
-const models=p=>(p.models||'').split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
+const models=p=>(p.models||'').split(/[,\n]/).map(s=>s.trim()).filter(s=>s&&!/embed|whisper|tts|guard|moderat|content[-_ ]?safety|rerank|(?:^|[-/])image|veo|lyria/i.test(s));
 const newChat=()=>chat={id:Date.now()+'',title:'New chat',t:Date.now(),sys:'',turns:[]};
 const label=k=>{const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));return k.slice(i+1).split('/').pop().replace(':free','')+' · '+(p?p.name:'?')};
 function lab(){if(S.auto){$('#bm').textContent='Smart';return}$('#bm').textContent=S.sel.length>1?S.sel.length+' models':S.sel.length?label(S.sel[0]).split(' · ')[0]:'Pick model'}
@@ -120,8 +120,8 @@ try{const b=await createImageBitmap(f,{imageOrientation:'from-image'}),lim=S.sav
 catch{toast('This image format is not supported. Try JPG, PNG or WebP')}}
 async function mic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return toast('Browser speech recognition is unavailable. Use the keyboard microphone instead.');
 if(rec){rec.stop();return}
-// Explicitly request Android microphone access first; some installed web apps do not trigger it through SpeechRecognition alone.
-try{if(navigator.mediaDevices?.getUserMedia){const stream=await navigator.mediaDevices.getUserMedia({audio:true});stream.getTracks().forEach(t=>t.stop())}}catch(e){return toast(e.name=='NotAllowedError'?'Allow microphone access in Chrome or AI Hub settings':'Could not access the microphone')}
+// Request Android microphone access only when needed. Reopening and immediately closing it on every tap can starve SpeechRecognition on some phones.
+try{let granted=false;try{granted=(await navigator.permissions?.query({name:'microphone'}))?.state=='granted'}catch{}if(!granted&&navigator.mediaDevices?.getUserMedia){const stream=await navigator.mediaDevices.getUserMedia({audio:true});stream.getTracks().forEach(t=>t.stop());await new Promise(r=>setTimeout(r,500))}}catch(e){return toast(e.name=='NotAllowedError'?'Allow microphone access in Chrome or AI Hub settings':'Could not access the microphone')}
 try{rec=new SR();rec.lang=S.lang||navigator.language;rec.interimResults=true;rec.continuous=!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);rec.maxAlternatives=1;const ta=$('#in'),base=ta.value?ta.value.trimEnd()+' ':'',micBtn=$('#mic');
 rec.onstart=()=>{micBtn.classList.add('on');micBtn.setAttribute('aria-label','Stop voice input');toast('Listening… speak now')};
 rec.onresult=e=>{let final='',interim='';for(let i=0;i<e.results.length;i++){const s=e.results[i][0]?.transcript||'';if(e.results[i].isFinal)final+=s+' ';else interim+=s}ta.value=base+(final+interim).trim();grow();meta()};
@@ -275,6 +275,6 @@ $('#ex').onclick=async()=>{const k=confirm('Include API keys in the backup file?
 $('#im').onclick=()=>$('#fi').click();
 $('#fi').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const c of d.chats||[])await chatPut(c);for(const p of d.prov||[]){const x=S.prov.find(z=>z.id==p.id);if(!x)S.prov.push(p);else if(!x.key&&p.key)x.key=p.key}await save();rp();toast('Imported')}catch{toast('Not a valid backup file')}};
 (async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.team=!!(await kvGet('team'));S.auto=(await kvGet('auto'))!==false;S.th=(await kvGet('th'))||'';S.lang=(await kvGet('lang'))||'';S.saver=!!(await kvGet('saver'));S.toolUrl=(await kvGet('toolUrl'))||'';S.toolToken=(await kvGet('toolToken'))||'';document.documentElement.dataset.th=S.th;S.h=(await kvGet('health'))||{};S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
-const all=(await chatAll()).sort((a,b)=>b.t-a.t);chat=all[0]||newChat();navigator.storage?.persist?.();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');af();lab();render();
+const all=(await chatAll()).sort((a,b)=>b.t-a.t),last=all[0];chat=last&&!last.turns.length?last:newChat();navigator.storage?.persist?.();if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');af();lab();render();
 if(!S.prov.length){rp();$('#ds').showModal()}})();
-</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a43bc32459b02895',t:'MTc5MDg2MDgwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>
+</script></body></html>
