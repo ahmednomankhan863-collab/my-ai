@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https:; img-src data:">
+<meta name="theme-color" content="#0f766e"><meta name="mobile-web-app-capable" content="yes">
+<title>AI Hub</title>
+<style>
+:root{--bg:#f5f7f8;--fg:#12202b;--mu:#5d6b76;--c:#e6ecef;--ac:#0f766e;--bd:#d3dce1}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1a21;--fg:#e8f0f3;--mu:#8ea0ab;--c:#182831;--ac:#2dd4bf;--bd:#263943}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{font:16px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--fg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+header,footer{display:flex;gap:8px;align-items:center;padding:8px}
+header{border-bottom:1px solid var(--bd)}footer{border-top:1px solid var(--bd);padding-bottom:calc(8px + env(safe-area-inset-bottom));align-items:flex-end}
+header b{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+button,input,textarea,select{font:inherit;color:inherit}
+button{background:var(--c);border:1px solid var(--bd);border-radius:10px;padding:8px 12px}
+button.p{background:var(--ac);border-color:var(--ac);color:var(--bg);font-weight:600}
+input,textarea,select{background:var(--c);border:1px solid var(--bd);border-radius:10px;padding:9px;width:100%}
+textarea{resize:none}footer textarea{max-height:140px}
+#msgs{flex:1;overflow-y:auto;padding:12px}
+.u{background:var(--ac);color:var(--bg);padding:9px 13px;border-radius:16px 16px 4px 16px;margin:12px 0 8px auto;width:fit-content;max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere}
+.a{border:1px solid var(--bd);border-radius:4px 16px 16px 16px;padding:9px 13px;margin:8px 0;overflow-wrap:anywhere}
+.a small{display:block;color:var(--mu);margin-bottom:2px}.a u{cursor:pointer}
+.a pre{background:var(--c);padding:9px;border-radius:8px;overflow-x:auto}
+.a code{background:var(--c);padding:1px 4px;border-radius:4px}.a pre code{background:none;padding:0}
+.mu{color:var(--mu)}.er{color:#d33;display:block}
+dialog{width:min(94vw,520px);max-height:88vh;border:1px solid var(--bd);border-radius:16px;background:var(--bg);color:var(--fg);padding:14px}
+dialog::backdrop{background:#0009}dialog h3{margin:14px 0 6px}
+.r{display:flex;gap:8px;margin:6px 0}.card{border:1px solid var(--bd);border-radius:12px;padding:10px;margin:8px 0;display:grid;gap:6px}
+.row{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}.row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ck{display:flex;gap:10px;align-items:center;padding:6px 0}.ck input{width:auto}
+#t{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:20px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+</style></head><body>
+<header><button id="bc">Chats</button><b id="ti">New chat</b><button id="bm">Models</button><button id="bs">Settings</button></header>
+<div id="msgs"></div>
+<footer><textarea id="in" rows="1" placeholder="Message"></textarea><button class="p" id="go">Send</button></footer>
+<dialog id="dc"><div class="r"><input id="q" placeholder="Search chats"><button class="p" id="nc">New</button></div><div id="cl"></div><button class="x">Close</button></dialog>
+<dialog id="dm"><h3>Models</h3><p class="mu">Tick several to ask all of them at once.</p><div id="ml"></div><button class="p x">Done</button></dialog>
+<dialog id="ds"><h3>Providers</h3><div id="pl"></div><div class="r"><select id="pp"></select><button id="ap">Add</button></div>
+<h3>System prompt for this chat</h3><textarea id="sy" rows="3" placeholder="Optional instructions for the AI"></textarea>
+<h3>Backup</h3><div class="r"><button id="ex">Export</button><button id="im">Import</button></div><p id="st" class="mu"></p>
+<input type="file" id="fi" accept=".json" hidden><button class="x">Close</button></dialog>
+<div id="t"></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PRE={OpenRouter:['https://openrouter.ai/api/v1','deepseek/deepseek-chat-v3-0324:free'],Groq:['https://api.groq.com/openai/v1','llama-3.3-70b-versatile'],Gemini:['https://generativelanguage.googleapis.com/v1beta/openai','gemini-2.0-flash'],DeepSeek:['https://api.deepseek.com/v1','deepseek-chat'],Custom:['','']};
+let db,S={prov:[],sel:[]},chat,busy=false,ctrl=[];
+const toast=m=>{const t=$('#t');t.textContent=m;t.style.opacity=1;setTimeout(()=>t.style.opacity=0,2200)};
+const openDb=()=>new Promise((ok,no)=>{const r=indexedDB.open('aihub',1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv');r.result.createObjectStore('chats',{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+const tx=(st,m,f)=>new Promise((ok,no)=>{const t=db.transaction(st,m),q=f(t.objectStore(st));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)});
+const kvGet=k=>tx('kv','readonly',s=>s.get(k)),kvSet=(k,v)=>tx('kv','readwrite',s=>s.put(v,k));
+const chatPut=c=>tx('chats','readwrite',s=>s.put(c)),chatDel=i=>tx('chats','readwrite',s=>s.delete(i)),chatGet=i=>tx('chats','readonly',s=>s.get(i)),chatAll=()=>tx('chats','readonly',s=>s.getAll());
+const save=()=>kvSet('prov',S.prov);
+const models=p=>(p.models||'').split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
+const newChat=()=>chat={id:Date.now()+'',title:'New chat',t:Date.now(),sys:'',turns:[]};
+const label=k=>{const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));return k.slice(i+1).split('/').pop().replace(':free','')+' · '+(p?p.name:'?')};
+function lab(){$('#bm').textContent=S.sel.length>1?S.sel.length+' models':S.sel.length?label(S.sel[0]).split(' · ')[0]:'Pick model'}
+function md(t){return t.split('```').map((p,i)=>{if(i%2){const n=p.indexOf('\n');return '<pre><code>'+esc(p.slice(n+1))+'</code></pre>'}return esc(p).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}).join('')}
+const body=a=>md(a.c)+(a.err?'<i class="er">Error: '+esc(a.err)+'</i>':'');
+function render(){$('#ti').textContent=chat.title;$('#msgs').innerHTML=chat.turns.map((t,i)=>`<div class="u">${esc(t.u)}</div>`+t.a.map((a,j)=>`<div class="a" data-t="${i}" data-j="${j}"><small>${esc(a.m)} · <u data-cp>copy</u></small><div class="b">${body(a)}</div></div>`).join('')).join('')||'<p class="mu" style="text-align:center;margin-top:28vh">Pick one or more models, then ask anything.</p>';$('#msgs').scrollTop=1e9}
+function paint(ch,ti,j){if(chat!==ch)return;const b=document.querySelector(`[data-t="${ti}"][data-j="${j}"] .b`),m=$('#msgs'),n=m.scrollHeight-m.scrollTop-m.clientHeight<160;if(b)b.innerHTML=body(ch.turns[ti].a[j]);if(n)m.scrollTop=1e9}
+async function run(ch,ti,j){const a=ch.turns[ti].a[j],i=a.k.indexOf('|'),p=S.prov.find(x=>x.id==a.k.slice(0,i)),model=a.k.slice(i+1);
+if(!p){a.err='Provider was removed';return}
+const c=new AbortController();ctrl.push(c);const msgs=ch.sys?[{role:'system',content:ch.sys}]:[];
+ch.turns.slice(0,ti+1).forEach((t,n)=>{msgs.push({role:'user',content:t.u});if(n<ti){const x=t.a.find(z=>z.k==a.k&&z.c)||t.a.find(z=>z.c);if(x)msgs.push({role:'assistant',content:x.c})}});
+try{const h={'Content-Type':'application/json'};if(p.key)h.Authorization='Bearer '+p.key;
+const r=await fetch(p.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',signal:c.signal,headers:h,body:JSON.stringify({model,messages:msgs,stream:true})});
+if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,200));
+const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();
+for(const l of ls){if(!l.startsWith('data:'))continue;const d=l.slice(5).trim();if(d=='[DONE]')continue;try{a.c+=JSON.parse(d).choices?.[0]?.delta?.content||''}catch{}}paint(ch,ti,j)}
+}catch(e){if(e.name=='AbortError')a.c+=a.c?'':'(stopped)';else a.err=e.message}
+paint(ch,ti,j)}
+async function send(){const ta=$('#in'),text=ta.value.trim();if(!text||busy)return;
+if(!S.sel.length){toast('Pick a model first');rm();$('#dm').showModal();return}
+const ch=chat,turn={u:text,a:S.sel.map(k=>({k,m:label(k),c:''}))};ch.turns.push(turn);if(ch.turns.length==1)ch.title=text.slice(0,40);
+ta.value='';grow();render();busy=true;$('#go').textContent='Stop';
+await Promise.all(turn.a.map((_,j)=>run(ch,ch.turns.length-1,j)));
+busy=false;ctrl=[];$('#go').textContent='Send';ch.t=Date.now();await chatPut(ch)}
+const grow=()=>{const t=$('#in');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
+$('#in').oninput=grow;$('#go').onclick=()=>busy?ctrl.forEach(c=>c.abort()):send();
+document.addEventListener('click',e=>{if(e.target.classList.contains('x'))e.target.closest('dialog').close()});
+$('#msgs').onclick=e=>{if(e.target.dataset.cp===undefined)return;const d=e.target.closest('.a').dataset;navigator.clipboard.writeText(chat.turns[d.t].a[d.j].c).then(()=>toast('Copied'))};
+function rm(){$('#ml').innerHTML=S.prov.map(p=>`<b>${esc(p.name)}</b>`+models(p).map(m=>{const k=p.id+'|'+m;return `<label class="ck"><input type="checkbox" value="${esc(k)}" ${S.sel.includes(k)?'checked':''}>${esc(m)}</label>`}).join('')).join('')||'<p>Add a provider in Settings first.</p>'}
+$('#ml').onchange=()=>{S.sel=[...document.querySelectorAll('#ml input:checked')].map(i=>i.value);kvSet('sel',S.sel);lab()};
+$('#bm').onclick=()=>{rm();$('#dm').showModal()};
+async function rc(){const q=$('#q').value.toLowerCase(),all=(await chatAll()).sort((a,b)=>b.t-a.t).filter(c=>!q||(c.title+JSON.stringify(c.turns)).toLowerCase().includes(q));$('#cl').innerHTML=all.map(c=>`<div class="row"><span data-o="${c.id}">${esc(c.title)}</span><button data-d="${c.id}">Delete</button></div>`).join('')||'<p class="mu">No chats yet.</p>'}
+$('#bc').onclick=()=>{rc();$('#dc').showModal()};$('#q').oninput=rc;
+$('#nc').onclick=()=>{newChat();render();$('#dc').close()};
+$('#cl').onclick=async e=>{const d=e.target.dataset;if(d.o){chat=await chatGet(d.o);render();$('#dc').close()}if(d.d&&confirm('Delete this chat?')){await chatDel(d.d);if(chat.id==d.d){newChat();render()}rc()}};
+function rp(){$('#pl').innerHTML=S.prov.map((p,i)=>`<div class="card"><input data-i="${i}" data-f="name" value="${esc(p.name)}" placeholder="Name"><input data-i="${i}" data-f="url" value="${esc(p.url)}" placeholder="Base URL"><input type="password" data-i="${i}" data-f="key" value="${esc(p.key)}" placeholder="API key"><textarea rows="2" data-i="${i}" data-f="models" placeholder="Model ids, comma separated">${esc(p.models)}</textarea><div class="r"><button data-fe="${i}">Fetch models</button><button data-rm="${i}">Remove</button></div></div>`).join('')}
+$('#pl').oninput=e=>{const t=e.target;if(t.dataset.f){S.prov[t.dataset.i][t.dataset.f]=t.value;save()}};
+$('#pl').onclick=async e=>{const d=e.target.dataset;
+if(d.rm!==undefined&&confirm('Remove this provider?')){S.prov.splice(d.rm,1);S.sel=S.sel.filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));await save();kvSet('sel',S.sel);rp();lab()}
+if(d.fe!==undefined){const p=S.prov[d.fe];try{const r=await fetch(p.url.replace(/\/$/,'')+'/models',{headers:p.key?{Authorization:'Bearer '+p.key}:{}});if(!r.ok)throw new Error(r.status);const j=await r.json();let ids=(j.data||j.models||[]).map(x=>(x.id||x.name).replace(/^models\//,''));if(/openrouter/.test(p.url))ids=ids.filter(i=>i.endsWith(':free'));p.models=ids.join(', ');await save();rp();toast(ids.length+' models found')}catch(x){toast('Could not fetch: '+x.message)}}};
+$('#pp').innerHTML=Object.keys(PRE).map(n=>`<option>${n}</option>`).join('');
+$('#ap').onclick=()=>{const n=$('#pp').value;S.prov.push({id:Date.now().toString(36),name:n,url:PRE[n][0],key:'',models:PRE[n][1]});save();rp()};
+$('#bs').onclick=()=>{rp();$('#sy').value=chat.sys||'';navigator.storage?.estimate?.().then(e=>$('#st').textContent='Storage used: '+(e.usage/1048576).toFixed(1)+' MB of about '+(e.quota/1073741824).toFixed(1)+' GB');$('#ds').showModal()};
+$('#sy').oninput=e=>{chat.sys=e.target.value;if(chat.turns.length)chatPut(chat)};
+$('#ex').onclick=async()=>{const k=confirm('Include API keys in the backup file?\nOK = include, Cancel = leave out');const d={v:1,prov:S.prov.map(p=>k?p:{...p,key:''}),chats:await chatAll()},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));a.download='ai-hub-backup.json';a.click()};
+$('#im').onclick=()=>$('#fi').click();
+$('#fi').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());for(const c of d.chats||[])await chatPut(c);for(const p of d.prov||[]){const x=S.prov.find(z=>z.id==p.id);if(!x)S.prov.push(p);else if(!x.key&&p.key)x.key=p.key}await save();rp();toast('Imported')}catch{toast('Not a valid backup file')}};
+(async()=>{db=await openDb();S.prov=(await kvGet('prov'))||[];S.sel=((await kvGet('sel'))||[]).filter(k=>S.prov.some(p=>p.id==k.split('|')[0]));
+const all=(await chatAll()).sort((a,b)=>b.t-a.t);chat=all[0]||newChat();navigator.storage?.persist?.();lab();render();
+if(!S.prov.length){rp();$('#ds').showModal()}})();
+</script></body></html>
