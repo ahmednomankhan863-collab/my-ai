@@ -4,123 +4,275 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0f766e">
+<meta name="description" content="AI Hub - Ultra-Fast Universal Multi-Model AI Assistant with In-Chat Image & Video Generator">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>AI Hub - Fixed</title>
+<link rel="manifest" href="manifest.json">
+<title>AI Hub - Universal AI Assistant</title>
 <style>
-:root{--bg:#f5f7f8;--fg:#12202b;--mu:#5d6b76;--c:#e6ecef;--ac:#0f766e;--bd:#d3dce1;--er:#dc2626;--ok:#16a34a}
-@media(prefers-color-scheme:dark){:root{--bg:#0e1a21;--fg:#e8f0f3;--mu:#8ea0ab;--c:#182831;--ac:#2dd4bf;--bd:#263943}}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;overscroll-behavior:none}
-body{font:16px/1.5 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--fg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);touch-action:manipulation}
-header,footer{display:flex;gap:8px;align-items:center;padding:8px;flex-shrink:0}
-header{border-bottom:1px solid var(--bd);background:var(--bg);position:sticky;top:0;z-index:10}
+:root{
+  --bg:#f8fafc;--fg:#0f172a;--mu:#64748b;--c:#f1f5f9;--card-bg:#ffffff;
+  --ac:#0f766e;--ac-hover:#115e59;--ac-light:rgba(15,118,110,0.1);
+  --bd:#e2e8f0;--er:#ef4444;--ok:#10b981;--warn:#f59e0b;
+  --radius:12px;--shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#090d10;--fg:#f1f5f9;--mu:#94a3b8;--c:#131c22;--card-bg:#0f171d;
+    --ac:#2dd4bf;--ac-hover:#14b8a6;--ac-light:rgba(45,212,191,0.12);
+    --bd:#1e293b;--shadow:0 1px 3px rgba(0,0,0,0.3);
+  }
+}
+[data-th="light"]{
+  --bg:#f8fafc;--fg:#0f172a;--mu:#64748b;--c:#f1f5f9;--card-bg:#ffffff;
+  --ac:#0f766e;--ac-hover:#115e59;--ac-light:rgba(15,118,110,0.1);
+  --bd:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+[data-th="dark"]{
+  --bg:#090d10;--fg:#f1f5f9;--mu:#94a3b8;--c:#131c22;--card-bg:#0f171d;
+  --ac:#2dd4bf;--ac-hover:#14b8a6;--ac-light:rgba(45,212,191,0.12);
+  --bd:#1e293b;--shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--fg);
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
+  touch-action:manipulation;
+}
+
+header,footer{display:flex;gap:8px;align-items:center;padding:8px 12px;flex-shrink:0}
+header{border-bottom:1px solid var(--bd);background:var(--bg);position:sticky;top:0;z-index:25;backdrop-filter:blur(8px)}
 footer{border-top:1px solid var(--bd);background:var(--bg);padding-bottom:calc(8px + env(safe-area-inset-bottom))}
-header b{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:17px}
+header b{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:16px;font-weight:600}
+
 button,input,textarea,select{font:inherit;color:inherit;-webkit-appearance:none;appearance:none}
-button{background:var(--c);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;cursor:pointer;min-height:44px;touch-action:manipulation;transition:all .15s}
-button:active{transform:scale(.97);opacity:.8}
-button:disabled{opacity:.5;cursor:not-allowed}
+button{
+  background:var(--c);border:1px solid var(--bd);border-radius:10px;
+  padding:8px 12px;cursor:pointer;min-height:38px;
+  touch-action:manipulation;transition:all .15s ease;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:500;
+}
+button:active{transform:scale(0.97);opacity:0.85}
+button:disabled{opacity:0.45;cursor:not-allowed}
 button.p{background:var(--ac);border-color:var(--ac);color:var(--bg);font-weight:600}
-input,textarea,select{background:var(--c);border:1px solid var(--bd);border-radius:12px;padding:12px;width:100%;font-size:16px}
-textarea{resize:none;min-height:44px}
+button.p:hover{background:var(--ac-hover)}
+
+input,textarea,select{background:var(--c);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;width:100%;font-size:14px}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--ac);border-color:transparent}
+textarea{resize:none;min-height:40px}
+
 #msgs{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.u{background:var(--ac);color:var(--bg);padding:10px 14px;border-radius:18px 18px 4px 18px;margin:12px 0 8px auto;width:fit-content;max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-.a{border:1px solid var(--bd);border-radius:4px 18px 18px 18px;padding:12px 14px;margin:8px 0;background:var(--c);overflow-wrap:anywhere;line-height:1.6}
-.a small{display:block;color:var(--mu);margin-bottom:6px;font-size:12px;display:flex;align-items:center;gap:6px}
-.a small:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac);flex-shrink:0}
-.a pre{background:#0b1419;color:#d8e6ec;padding:10px;border-radius:8px;overflow-x:auto;font-size:13px;margin:8px 0}
-.a code{background:rgba(0,0,0,.1);padding:2px 5px;border-radius:4px;font-size:.9em}
-.a pre code{background:none;padding:0}
-.a p{margin:.5em 0}.a h3,.a h4{margin:.8em 0 .3em}
-.a ul,.a ol{margin:.4em 0;padding-left:1.3em}
-.a blockquote{margin:.5em 0;padding-left:10px;border-left:3px solid var(--bd);color:var(--mu)}
-.a a{color:var(--ac);word-break:break-all}
-.a.f{border:0;box-shadow:inset 3px 0 0 var(--ac)}
-.a.rv{background:none;border:1px dashed var(--bd);font-size:14px;color:var(--mu)}
-.er{color:var(--er);display:block;font-size:14px;margin-top:6px}
+.msg{margin-bottom:18px}
+.u{
+  background:var(--ac);color:var(--bg);
+  padding:10px 14px;border-radius:18px 18px 4px 18px;
+  margin:10px 0 6px auto;width:fit-content;max-width:88%;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+  box-shadow:0 1px 3px rgba(0,0,0,0.12);font-size:15px;
+}
+.u img{max-width:100%;max-height:240px;border-radius:10px;display:block;margin-bottom:6px;object-fit:cover}
+.u small{display:block;opacity:0.9;margin-bottom:4px;font-size:12px;font-weight:500}
+
+.a{
+  border:1px solid var(--bd);border-radius:4px 18px 18px 18px;
+  padding:12px 14px;margin:8px 0;background:var(--card-bg);
+  overflow-wrap:anywhere;line-height:1.6;box-shadow:var(--shadow);
+}
+.a small.model-tag{
+  display:inline-flex;align-items:center;gap:6px;color:var(--mu);
+  margin-bottom:8px;font-size:12px;font-weight:600;padding:2px 8px;
+  background:var(--c);border-radius:12px;border:1px solid var(--bd);
+}
+.a small.model-tag:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ac);flex-shrink:0}
+.a pre{background:#0b1419;color:#d8e6ec;padding:10px 12px;border-radius:8px;overflow-x:auto;font-size:13px;margin:8px 0;line-height:1.45}
+.a code{background:rgba(0,0,0,0.07);padding:2px 5px;border-radius:4px;font-size:0.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){.a code{background:rgba(255,255,255,0.08)}}
+.a pre code{background:none;padding:0;color:inherit}
+.a p{margin:0.4em 0}
+.a h1,.a h2,.a h3,.a h4{margin:0.8em 0 0.3em;color:var(--fg)}
+.a ul,.a ol{margin:0.4em 0;padding-left:1.3em}
+.a blockquote{margin:0.5em 0;padding-left:10px;border-left:3px solid var(--ac);color:var(--mu)}
+.a a{color:var(--ac);word-break:break-all;text-decoration:none}
+.a a:hover{text-decoration:underline}
+.a.f{border-left:3px solid var(--ac)}
+.a.rv{background:transparent;border:1px dashed var(--bd);font-size:14px;color:var(--mu)}
+
+.er{color:var(--er);display:block;font-size:13px;margin-top:6px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:8px;border:1px solid rgba(239,68,68,0.25)}
 .mu{color:var(--mu)}
-dialog{width:min(94vw,520px);max-height:88vh;border:1px solid var(--bd);border-radius:16px;background:var(--bg);color:var(--fg);padding:16px;z-index:100}
-dialog::backdrop{background:rgba(0,0,0,.6)}
-dialog h3{margin:0 0 10px;font-size:18px}
+
+/* Top Audio Bar */
+#audio-bar{
+  display:none;position:sticky;top:49px;z-index:20;
+  background:var(--ac);color:var(--bg);
+  padding:7px 14px;font-size:13px;font-weight:600;
+  align-items:center;justify-content:space-between;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+#audio-bar.active{display:flex}
+#audio-bar .audio-acts{display:flex;gap:6px;align-items:center}
+#audio-bar button{
+  background:rgba(0,0,0,0.2);border:none;color:inherit;
+  padding:3px 9px;min-height:auto;border-radius:6px;font-size:12px;
+}
+#audio-bar select{
+  background:rgba(0,0,0,0.2);border:none;color:inherit;
+  padding:2px 6px;min-height:auto;border-radius:6px;font-size:12px;width:auto;
+}
+
+/* In-Chat Image / Tool Card */
+.chat-tool-card{
+  border:1px solid var(--bd);background:var(--c);
+  border-radius:12px;padding:10px;margin:8px 0;
+}
+.chat-tool-card img{
+  width:100%;max-height:420px;object-fit:contain;border-radius:8px;
+  background:#000;display:block;cursor:zoom-in;transition:opacity .2s;
+}
+.chat-tool-card .card-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--mu)}
+
+/* Dialogs */
+dialog{
+  width:min(94vw,520px);max-height:88vh;border:1px solid var(--bd);
+  border-radius:16px;background:var(--bg);color:var(--fg);padding:16px;z-index:100;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+dialog::backdrop{background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)}
+dialog h3{margin:0 0 10px;font-size:17px}
 .r{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
 .r>*{flex:1;min-width:120px}
-.card{border:1px solid var(--bd);border-radius:12px;padding:12px;margin:8px 0;display:grid;gap:8px}
-.row{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd);align-items:center}
+.card{border:1px solid var(--bd);background:var(--card-bg);border-radius:12px;padding:12px;margin:8px 0;display:grid;gap:8px}
+.row{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--bd);align-items:center}
 .row span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ck{display:flex;gap:10px;align-items:center;padding:8px 0}
-.ck input{width:auto;min-width:20px;min-height:20px}
-#t{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:24px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;font-size:14px;max-width:90vw;text-align:center}
-.dots i{display:inline-block;width:8px;height:8px;margin:0 3px;border-radius:50%;background:var(--ac);animation:bl 1s infinite}
+.ck{display:flex;gap:10px;align-items:center;padding:7px 0;cursor:pointer;font-size:14px}
+.ck input{width:auto;min-width:18px;min-height:18px}
+
+#t{
+  position:fixed;left:50%;bottom:85px;transform:translateX(-50%);
+  background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:24px;
+  opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;
+  font-size:13px;max-width:90vw;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,0.25);
+}
+.dots i{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--ac);animation:bl 1s infinite}
 .dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
 @keyframes bl{50%{opacity:.25}}
-.em{text-align:center;margin-top:15vh;padding:20px}
-.em h2{margin:0 0 16px;font-size:24px}
-.em button{margin:4px;border-radius:20px;padding:10px 18px}
-.ac{display:flex;gap:12px;font-size:13px;color:var(--mu);margin:4px 0}
-.ac u,.act{cursor:pointer;padding:3px 6px;border-radius:6px;font-size:12px;color:var(--mu);background:transparent;border:none;min-height:auto}
-.ac u:active{background:var(--c)}
-.cb{margin:8px 0;border-radius:10px;overflow:hidden;border:1px solid var(--bd)}
-.ch{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg);font-size:12px;color:var(--mu)}
-.ch u{cursor:pointer;padding:4px 8px}
+
+.em{text-align:center;margin-top:8vh;padding:20px}
+.em h2{margin:0 0 10px;font-size:22px;font-weight:700}
+.em p{margin:0 0 16px;color:var(--mu);font-size:14px}
+.em .quick-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:540px;margin:0 auto}
+.em button{border-radius:20px;padding:8px 14px;font-size:13px;min-height:36px}
+
+.ac{display:flex;gap:8px;font-size:12px;color:var(--mu);margin:6px 0 0;flex-wrap:wrap}
+.act{
+  background:transparent;border:0;padding:3px 8px;font-size:12px;color:var(--mu);
+  cursor:pointer;border-radius:6px;min-height:auto;display:inline-flex;align-items:center;gap:4px;
+}
+.act:hover{color:var(--fg);background:rgba(0,0,0,0.06)}
+@media(prefers-color-scheme:dark){.act:hover{background:rgba(255,255,255,0.08)}}
+.act.speaking{color:var(--er);font-weight:600}
+
+.cb{margin:8px 0;border-radius:10px;overflow:hidden;border:1px solid var(--bd);background:#0b1419}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,0.06);font-size:12px;color:#94a3b8}
+.ch .ch-acts{display:flex;gap:4px}
+
 #pv{display:flex;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid var(--bd);background:var(--c);overflow-x:auto}
 #pv:empty{display:none}
-#pv img{height:56px;border-radius:8px;cursor:zoom-in}
+#pv img{height:52px;border-radius:6px;cursor:zoom-in}
 #pv span{font-size:13px;flex-shrink:0}
+
 .composer{display:flex;flex:1;align-items:flex-end;gap:6px;min-width:0}
 .composer textarea{flex:1}
-#down{position:fixed;right:16px;bottom:90px;width:44px;height:44px;border-radius:50%;padding:0;box-shadow:0 4px 18px rgba(0,0,0,.3);display:none;z-index:5;font-size:18px}
-#meta{font-size:11px;color:var(--mu);padding:0 12px 4px;text-align:right}
+#down{position:fixed;right:16px;bottom:85px;width:40px;height:40px;border-radius:50%;padding:0;box-shadow:0 3px 14px rgba(0,0,0,0.25);display:none;z-index:10;font-size:16px}
+#meta{font-size:11px;color:var(--mu);padding:2px 12px 4px;text-align:right}
+
 .imgview{padding:0;background:transparent;border:0;max-width:96vw;max-height:92vh}
 .imgview img{display:block;max-width:96vw;max-height:90vh;border-radius:12px}
-.imgview button{position:absolute;right:8px;top:8px;border-radius:50%;width:36px;height:36px;padding:0}
+.imgview button{position:absolute;right:8px;top:8px;border-radius:50%;width:34px;height:34px;padding:0;background:rgba(0,0,0,0.6);color:#fff;border:none}
+
 #ir{margin-top:12px}
-#ir img{display:block;width:100%;max-height:50vh;object-fit:contain;border-radius:12px;background:var(--c)}
+#ir img{display:block;width:100%;max-height:50vh;object-fit:contain;border-radius:10px;background:var(--c)}
 .prog{width:100%;height:4px;background:var(--c);border-radius:2px;overflow:hidden;margin:8px 0}
 .prog>div{height:100%;background:var(--ac);width:0%;transition:width .3s;border-radius:2px}
 .status{font-size:13px;color:var(--mu);margin:6px 0;display:flex;align-items:center;gap:8px}
-.status .spin{width:16px;height:16px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0}
+.status .spin{width:15px;height:15px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:620px){header{padding:6px;gap:4px}header button{padding:8px 10px;font-size:14px}#msgs{padding:10px}.u{max-width:92%}footer{gap:4px;padding:6px}footer>button{width:44px;padding:8px;font-size:16px}.composer{gap:4px}#go{width:auto;padding:8px 14px}.ac{gap:6px;font-size:12px}.em{margin-top:10vh}.em h2{font-size:20px}}
-@media(min-width:900px){#msgs{padding-inline:max(12px,calc((100vw - 900px)/2))}}
-.u img{max-width:100%;max-height:220px;border-radius:10px;display:block;margin-bottom:6px}
-.u small{display:block;opacity:.85;margin-bottom:5px;font-size:12px}
-.tw{overflow-x:auto;margin:.6em 0}
-.a table{border-collapse:collapse;font-size:14px;min-width:100%}
-.a th,.a td{border:1px solid var(--bd);padding:6px 10px;text-align:left}
-.a th{background:var(--bg)}
-.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.tw{overflow-x:auto;margin:0.6em 0}
+.a table{border-collapse:collapse;font-size:13px;min-width:100%}
+.a th,.a td{border:1px solid var(--bd);padding:6px 8px;text-align:left}
+.a th{background:var(--c)}
+
+@media(max-width:620px){
+  header{padding:6px 8px;gap:4px}
+  header button{padding:6px 8px;font-size:13px;min-height:36px}
+  #msgs{padding:8px}
+  .u{max-width:92%}
+  footer{gap:4px;padding:6px 8px}
+  footer>button{width:38px;padding:6px;font-size:15px;min-height:38px}
+  .composer{gap:4px}
+  #go{width:auto;padding:8px 12px;min-height:38px}
+  .em{margin-top:5vh}
+}
+@media(min-width:900px){#msgs{padding-inline:max(16px,calc((100vw - 880px)/2))}}
 </style>
 </head>
 <body>
 <header>
-<button id="bc" aria-label="Chats">💬</button>
+<button id="bc" title="Chats" aria-label="Chats">💬</button>
 <b id="ti">New chat</b>
-<button id="bm" aria-label="Models">🤖</button>
-<button id="bs" aria-label="Settings">⚙️</button>
+<button id="bm" title="Model Selector" aria-label="Models">🤖 Smart</button>
+<button id="bs" title="Settings" aria-label="Settings">⚙️</button>
 </header>
+
+<div id="audio-bar">
+<span>🔊 Reading response aloud...</span>
+<div class="audio-acts">
+<select id="audio-speed" aria-label="Speech speed">
+<option value="1">1.0x</option>
+<option value="1.25">1.25x</option>
+<option value="1.5">1.5x</option>
+</select>
+<button id="audio-stop-btn">⏹ Stop</button>
+</div>
+</div>
+
 <main id="msgs" aria-label="Conversation" aria-live="polite"></main>
 <button id="down" aria-label="Scroll to bottom">↓</button>
 <div id="pv" aria-label="Attachments"></div>
+
 <footer>
-<button id="at" aria-label="Attach">📎</button>
-<button id="bi" aria-label="Generate image">🎨</button>
-<button id="mic" aria-label="Voice input">🎤</button>
+<button id="at" title="Attach file or photo" aria-label="Attach">📎</button>
+<button id="bi" title="Generate Image" aria-label="Generate image">🎨</button>
+<button id="bv" title="Video Hub" aria-label="Video generator tools">🎬</button>
+<button id="mic" title="Voice Input" aria-label="Voice input">🎤</button>
 <div class="composer">
-<textarea id="in" rows="1" maxlength="20000" aria-label="Message" placeholder="Message" enterkeyhint="send"></textarea>
+<textarea id="in" rows="1" maxlength="20000" aria-label="Message" placeholder="Message or type 'draw a cyberpunk car'..." enterkeyhint="send"></textarea>
 <button class="p" id="go">Send</button>
 </div>
 </footer>
 <div id="meta" aria-live="polite"></div>
 <input type="file" id="fl" accept="image/*,.txt,.md,.markdown,.csv,.json,.js,.ts,.jsx,.tsx,.py,.html,.css,.xml,.yaml,.yml,.toml,.sql" hidden>
 
+<!-- Image Viewer Modal -->
 <dialog id="iv" class="imgview"><img id="ivi" alt="Preview"><button class="x" aria-label="Close">✕</button></dialog>
 
+<!-- Code / HTML Preview Modal -->
+<dialog id="dpv" style="width:min(96vw,800px);height:80vh">
+<div class="row"><b id="dpv-title">Live Preview</b><button class="x">✕</button></div>
+<iframe id="dpv-frame" sandbox="allow-scripts" style="width:100%;height:calc(100% - 40px);border:1px solid var(--bd);border-radius:8px;background:#fff"></iframe>
+</dialog>
+
+<!-- Image Generator Modal -->
 <dialog id="di">
-<h3>🎨 Generate Image</h3>
-<p class="mu" style="font-size:13px">Uses Pollinations.ai (free, no key needed) or your configured providers</p>
-<textarea id="ip" rows="3" maxlength="4000" placeholder="Describe the image you want..."></textarea>
+<h3>🎨 Fast Image Generator</h3>
+<p class="mu" style="font-size:13px">Uses Pollinations.ai (Free, unlimited, no key required) or your provider keys.</p>
+<textarea id="ip" rows="3" maxlength="4000" placeholder="Describe the image in detail... (e.g. A futuristic neon supercar speeding through rain)"></textarea>
 <div class="r">
 <select id="iar" aria-label="Aspect ratio">
 <option value="1:1">Square 1:1</option>
@@ -130,98 +282,135 @@ dialog h3{margin:0 0 10px;font-size:18px}
 <option value="3:4">Portrait 3:4</option>
 </select>
 <select id="istyle" aria-label="Style">
-<option value="">No style</option>
-<option value="photorealistic">Photorealistic</option>
-<option value="digital art">Digital Art</option>
-<option value="anime">Anime</option>
-<option value="oil painting">Oil Painting</option>
-<option value="3d render">3D Render</option>
-<option value="sketch">Sketch</option>
+<option value="">Natural / Default</option>
+<option value="photorealistic cinematic lighting 8k">Photorealistic</option>
+<option value="digital illustration sharp vibrant">Digital Art</option>
+<option value="anime style studio ghibli vibrant">Anime</option>
+<option value="oil painting canvas textured">Oil Painting</option>
+<option value="3d render unreal engine 5 octane">3D Render</option>
+<option value="pencil sketch detailed line art">Sketch</option>
 </select>
 </div>
 <div class="r">
-<button class="p" id="ig">Generate</button>
+<button class="p" id="ig">Generate Image</button>
 <button class="x">Close</button>
 </div>
 <div id="ir" aria-live="polite"></div>
 </dialog>
 
+<!-- Video Generator & Pricing Guide Modal -->
+<dialog id="dv">
+<h3>🎬 AI Video Generator Hub</h3>
+<p class="mu" style="font-size:13px">Free tier allowances, pricing breakdown, and video prompt blueprints.</p>
+<div style="max-height:60vh;overflow-y:auto">
+<div class="card">
+<b>🆓 Best Free Video Generating Tools</b>
+<div style="font-size:13px;line-height:1.6">
+• <b>Kling AI</b>: 66 daily free credits (~1-2 free 5s clips/day). High realism.<br>
+• <b>Luma Dream Machine</b>: 30 free video generations/month (~5s each).<br>
+• <b>Hailuo AI / Minimax</b>: Generous free credits with rapid generation.<br>
+• <b>Pollinations Video</b>: Free experimental AI video prompt rendering.
+</div>
+</div>
+
+<div class="card">
+<b>💰 Making a 30-Second Video (Strategy & Cost)</b>
+<div style="font-size:13px;line-height:1.6">
+• Standard AI video models generate <b>4 to 5 seconds per clip</b>.<br>
+• A 30-second video requires <b>6 consecutive 5-second scenes</b>.<br>
+• <b>Free Method</b>: Generate 6 individual scene clips on Kling/Luma, then merge them in <b>CapCut</b> or <b>Clipchamp</b> with free background audio.<br>
+• <b>Estimated Cost</b>: 100% Free with daily token rotations, or ~Rs. 2,800 to 4,500/month for standard paid subscription tiers (Runway/Kling).
+</div>
+</div>
+
+<div class="r">
+<button id="b-make-vprompt" class="p">✨ Generate 30s Video Script & Prompts</button>
+<button class="x">Close</button>
+</div>
+</div>
+</dialog>
+
+<!-- Chats Dialog -->
 <dialog id="dc">
 <div class="r"><input id="q" placeholder="Search chats"><button class="p" id="nc">New</button></div>
 <div id="cl" style="max-height:50vh;overflow-y:auto"></div>
 <button class="x" style="width:100%;margin-top:10px">Close</button>
 </dialog>
 
+<!-- Models Dialog -->
 <dialog id="dm">
-<h3>Models</h3>
-<p class="mu" style="font-size:13px">Smart mode recommended. Manual mode lets you pick specific models.</p>
+<h3>Models & Intelligence</h3>
+<p class="mu" style="font-size:13px">Smart mode auto-routes prompts to the best model and manages token budgets.</p>
 <div id="ml" style="max-height:40vh;overflow-y:auto"></div>
-<label class="ck"><input type="checkbox" id="au" checked> Smart mode: auto-pick best model</label>
-<label class="ck"><input type="checkbox" id="tm"> Compare mode: multiple models answer together</label>
+<label class="ck"><input type="checkbox" id="au" checked> <b>Smart mode</b>: Auto-route to best model</label>
+<label class="ck"><input type="checkbox" id="tm"> <b>Compare mode</b>: Multi-model simultaneous answers</label>
 <button class="p x" style="width:100%;margin-top:10px">Done</button>
 </dialog>
 
+<!-- Settings Dialog -->
 <dialog id="ds">
 <h3>⚙️ Settings</h3>
 <div style="max-height:60vh;overflow-y:auto">
 <h3 style="font-size:15px;margin-top:12px">Providers</h3>
-<p class="mu" style="font-size:12px">Keys stay in your browser only. Get free keys: <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a> | <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a></p>
+<p class="mu" style="font-size:12px">Keys stay in your browser only. Get free keys: <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a> | <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> | <a href="https://console.groq.com/keys" target="_blank">Groq</a></p>
 <div id="pl"></div>
 <div class="r">
 <select id="pp">
-<option value="Gemini">Gemini (Google)</option>
+<option value="Pollinations">Pollinations (Free & Unlimited, No Key)</option>
+<option value="Gemini">Gemini (Google AI Studio)</option>
 <option value="OpenRouter">OpenRouter</option>
 <option value="Groq">Groq</option>
 <option value="DeepSeek">DeepSeek</option>
-<option value="Custom">Custom</option>
+<option value="Custom">Custom OpenAI Endpoint</option>
 </select>
 <button id="ap">Add</button>
 </div>
 
-<h3 style="font-size:15px;margin-top:16px">Assistant</h3>
+<h3 style="font-size:15px;margin-top:16px">Assistant Persona</h3>
 <div class="r">
 <select id="pr">
-<option value="">General</option>
-<option value="study">Tutor</option>
-<option value="code">Developer</option>
-<option value="write">Writer</option>
-<option value="plan">Planner</option>
-<option value="critical">Critical Thinker</option>
+<option value="">General Assistant</option>
+<option value="study">Expert Tutor</option>
+<option value="code">Senior Developer</option>
+<option value="write">Creative & Clear Writer</option>
+<option value="plan">Practical Planner</option>
+<option value="critical">Critical Analyst</option>
 </select>
 <select id="detail">
-<option value="concise">Concise</option>
-<option value="normal" selected>Normal</option>
-<option value="detailed">Detailed</option>
+<option value="concise">Concise Answers</option>
+<option value="normal" selected>Normal Length</option>
+<option value="detailed">In-depth / Detailed</option>
 </select>
 </div>
 
-<h3 style="font-size:15px;margin-top:16px">Look & Voice</h3>
+<h3 style="font-size:15px;margin-top:16px">Appearance & Voice</h3>
 <div class="r">
 <select id="th">
-<option value="">Match phone</option>
-<option value="light">Light</option>
-<option value="dark">Dark</option>
+<option value="">System Default</option>
+<option value="light">Light Theme</option>
+<option value="dark">Dark Theme</option>
 </select>
 <select id="lg">
-<option value="">Device language</option>
-<option value="en-US">English</option>
+<option value="">Device Language</option>
+<option value="en-US">English (US)</option>
+<option value="en-GB">English (UK)</option>
 <option value="ur-PK">Urdu</option>
 <option value="hi-IN">Hindi</option>
 <option value="ar-SA">Arabic</option>
 <option value="es-ES">Spanish</option>
 </select>
 </div>
-<label class="ck" style="margin-top:8px"><input type="checkbox" id="dsav"> Data saver (smaller images, shorter context)</label>
+<label class="ck" style="margin-top:8px"><input type="checkbox" id="dsav"> Data saver (compact images, lighter token context)</label>
 
-<h3 style="font-size:15px;margin-top:16px">Data</h3>
+<h3 style="font-size:15px;margin-top:16px">Data Management</h3>
 <div class="r">
-<button id="ec">Export chat</button>
-<button id="ex">Full backup</button>
+<button id="ec">Export chat (.md)</button>
+<button id="ex">Full Backup (.json)</button>
 <button id="im">Import</button>
 </div>
 <div class="r">
-<button id="ci" style="color:var(--er)">Clear images</button>
-<button id="cdata" style="color:var(--er)">Reset all data</button>
+<button id="ci" style="color:var(--er)">Clear Images</button>
+<button id="cdata" style="color:var(--er)">Reset All Data</button>
 </div>
 <p id="st" class="mu" style="font-size:12px"></p>
 </div>
@@ -233,134 +422,127 @@ dialog h3{margin:0 0 10px;font-size:18px}
 
 <script>
 'use strict';
-// ============ FIXED AI HUB - All issues resolved ============
-// Key fixes:
-// 1. CORS: Uses multiple CORS-friendly endpoints + proxy fallbacks
-// 2. Voice: Uses Web Speech API with graceful fallback + visual feedback
-// 3. Images: Pollinations.ai (no key, fast) + provider fallbacks
-// 4. Mobile: Touch-optimized, safe areas, proper viewport
-// 5. Errors: User-friendly messages with retry suggestions
+// ============ AI HUB UNIVERSAL CORE ============
 
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
 const PRE={
-Gemini:{url:'https://generativelanguage.googleapis.com/v1beta/openai',model:'gemini-2.5-flash',keyUrl:'https://aistudio.google.com/apikey'},
-OpenRouter:{url:'https://openrouter.ai/api/v1',model:'openrouter/free',keyUrl:'https://openrouter.ai/keys'},
-Groq:{url:'https://api.groq.com/openai/v1',model:'llama-3.3-70b-versatile',keyUrl:'https://console.groq.com/keys'},
-DeepSeek:{url:'https://api.deepseek.com/v1',model:'deepseek-chat',keyUrl:'https://platform.deepseek.com'},
+Pollinations:{url:'https://text.pollinations.ai',model:'openai, mistral, searchgpt, qwen-coder, deepseek',keyUrl:''},
+Gemini:{url:'https://generativelanguage.googleapis.com/v1beta/openai',model:'gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro',keyUrl:'https://aistudio.google.com/apikey'},
+OpenRouter:{url:'https://openrouter.ai/api/v1',model:'openrouter/free, meta-llama/llama-3.3-70b-instruct:free, google/gemini-2.0-flash-exp:free',keyUrl:'https://openrouter.ai/keys'},
+Groq:{url:'https://api.groq.com/openai/v1',model:'llama-3.3-70b-versatile, llama-3.1-8b-instant, mixtral-8x7b-32768',keyUrl:'https://console.groq.com/keys'},
+DeepSeek:{url:'https://api.deepseek.com/v1',model:'deepseek-chat, deepseek-reasoner',keyUrl:'https://platform.deepseek.com'},
 Custom:{url:'',model:'',keyUrl:''}
 };
-const PROFILES={study:'You are a patient expert tutor. Explain step by step, use short examples, check understanding.',code:'You are a senior software engineer. Provide correct, secure, maintainable code with tradeoffs explained.',write:'You are a precise editor. Improve clarity and structure while preserving voice.',plan:'You are a practical planner. Break goals into prioritized steps with risks and next actions.',critical:'You are a rigorous critical thinker. Challenge assumptions, identify uncertainty, never just agree.'};
 
-let db,S={prov:[],sel:[],auto:true,team:false,th:'',lang:'',profile:'',detail:'normal',saver:false,h:{}},chat,busy=false,halt=false,ctrl=[],recognition=null,audioCtx=null;
+const PROFILES={
+study:'You are a patient expert tutor. Explain step by step, use clear examples, check understanding.',
+code:'You are a senior software engineer. Provide correct, secure, maintainable code with clear explanations.',
+write:'You are a precise editor and writer. Improve clarity, style, and structure.',
+plan:'You are a practical planner. Break goals into actionable, prioritized steps with clear milestones.',
+critical:'You are a rigorous critical thinker. Challenge assumptions, identify risks, and provide balanced insights.'
+};
 
-// ============ UTILITIES ============
+let db,S={prov:[],sel:[],auto:true,team:false,th:'',lang:'',profile:'',detail:'normal',saver:false,h:{}},chat,busy=false,halt=false,ctrl=[],recognition=null,currentSpeechBtn=null,speechRate=1;
+
+// ============ UTILITIES & STORAGE ============
 const toast=m=>{const t=$('#t');t.textContent=m;t.style.opacity=1;clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity=0,2500)};
-const openDb=()=>new Promise((ok,no)=>{const r=indexedDB.open('aihub_fixed',1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv');r.result.createObjectStore('chats',{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+const openDb=()=>new Promise((ok,no)=>{const r=indexedDB.open('aihub_universal_v3',1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv');r.result.createObjectStore('chats',{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const tx=(st,m,f)=>new Promise((ok,no)=>{const t=db.transaction(st,m),q=f(t.objectStore(st));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)});
 const kvGet=k=>tx('kv','readonly',s=>s.get(k)),kvSet=(k,v)=>tx('kv','readwrite',s=>s.put(v,k));
 const chatPut=c=>tx('chats','readwrite',s=>s.put(c)),chatDel=i=>tx('chats','readwrite',s=>s.delete(i)),chatGet=i=>tx('chats','readonly',s=>s.get(i)),chatAll=()=>tx('chats','readonly',s=>s.getAll());
 const save=()=>kvSet('prov',S.prov);
 
-// ============ CORS-FREE API CALLS ============
-// Strategy: Try multiple endpoints in order of reliability
+// ============ MODEL FILTER & TOKEN BUDGET ============
+const NONCHAT=/embed|whisper|tts|guard|moderat|content[-_ ]?safety|rerank|robotic|translate|transcri|speech|live|realtime|bidi|audio[-_ ]preview|voice|native[-_ ]audio|imagen|veo|lyria|chirp|(?:^|[-_/])(?:image|flux|sdxl|stable[-_ ]?diffusion)(?:$|[-_/:])/i;
+const chatReady=m=>m&&!NONCHAT.test(m);
+const models=p=>(p.models||'').split(/[,\n]/).map(s=>s.trim()).filter(chatReady);
 
-async function tryFetch(url,options,timeout=30000){
+function estimateTokens(text){
+if(!text)return 0;
+return Math.ceil(text.length/3.8);
+}
+
+// ============ ROBUST FETCH ============
+async function tryFetch(url,options,timeout=35000){
 const c=new AbortController();const t=setTimeout(()=>c.abort(),timeout);
 try{const r=await fetch(url,{...options,signal:c.signal});clearTimeout(t);return r}
 catch(e){clearTimeout(t);throw e}
 }
 
-// CORS proxies as fallback (only used if direct fails)
-const PROXIES=['','https://corsproxy.io/?','https://api.allorigins.win/raw?url='];
-
-async function robustFetch(url,options={},timeout=30000){
-let lastErr;
-for(const proxy of PROXIES){
-try{
-const fullUrl=proxy?proxy+encodeURIComponent(url):url;
-const r=await tryFetch(fullUrl,options,timeout);
-if(r.ok)return r;
-if(r.status===401||r.status===403)throw new Error('Invalid API key');
-lastErr=new Error('HTTP '+r.status);
-}catch(e){
-lastErr=e;
-if(e.message==='Invalid API key')throw e;
-// Continue to next proxy
-}
-}
-throw lastErr||new Error('Network error - check connection');
+async function robustFetch(url,options={},timeout=35000){
+return await tryFetch(url,options,timeout);
 }
 
-// ============ IMAGE GENERATION (FIXED - Fast & Reliable) ============
-// Primary: Pollinations.ai (no key, CORS-enabled, fast)
-// Fallback: Provider APIs if configured
-
-async function generateImagePollinations(prompt,aspect,style){
-const ar=aspect||'1:1';
-const styled=style?prompt+', '+style+' style':prompt;
-const encoded=encodeURIComponent(styled);
-// Pollinations supports width/height based on aspect
-const dims={'1:1':[1024,1024],'16:9':[1280,720],'9:16':[720,1280],'4:3':[1024,768],'3:4':[768,1024]}[ar]||[1024,1024];
-const url=`https://image.pollinations.ai/prompt/${encoded}?width=${dims[0]}&height=${dims[1]}&nologo=true&enhance=true`;
-return url;
+// ============ TTS VOICE ENGINE (WITH SPEED & STOP TOGGLE) ============
+function stopSpeech(){
+if('speechSynthesis'in window){
+speechSynthesis.cancel();
+}
+if(currentSpeechBtn){
+currentSpeechBtn.textContent='🔊 Read';
+currentSpeechBtn.classList.remove('speaking');
+currentSpeechBtn=null;
+}
+$('#audio-bar').classList.remove('active');
 }
 
-async function generateImageProvider(prompt,aspect,style,provider,model){
-const ar=aspect||'1:1';
-const messages=[{role:'user',content:prompt+(style?', '+style+' style':'')}];
-const body={model,messages,modalities:['image','text']};
-if(ar!=='1:1')body.image_config={aspect_ratio:ar};
-const r=await robustFetch(provider.url.replace(/\/$/,'')+'/chat/completions',{
-method:'POST',
-headers:{'Content-Type':'application/json','Authorization':'Bearer '+provider.key},
-body:JSON.stringify(body)
-},60000);
-const data=await r.json();
-// Extract image from various response formats
-const msg=data.choices?.[0]?.message;
-if(msg?.images?.[0]?.image_url?.url)return msg.images[0].image_url.url;
-if(msg?.content){
-if(Array.isArray(msg.content)){
-for(const part of msg.content){
-if(part.image_url?.url)return part.image_url.url;
-if(part.type==='image_url')return part.image_url;
-}
-}
-if(typeof msg.content==='string'){
-const match=msg.content.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
-if(match)return match[0];
-}
-}
-throw new Error('No image in response');
+function speakText(text,btn){
+if(!('speechSynthesis'in window)){toast('Read aloud not supported in this browser');return}
+
+if(speechSynthesis.speaking){
+stopSpeech();
+if(currentSpeechBtn===btn)return;
 }
 
-// ============ VOICE INPUT (FIXED) ============
+const clean=text.replace(/```[\s\S]*?```/g,' code block ').replace(/[#*_|`]/g,'').slice(0,8000);
+const u=new SpeechSynthesisUtterance(clean);
+u.lang=S.lang||navigator.language||'en-US';
+u.rate=parseFloat($('#audio-speed').value)||speechRate||1;
+u.pitch=1;
+
+const voices=speechSynthesis.getVoices();
+const preferred=voices.find(v=>v.lang.startsWith((S.lang||'en').split('-')[0])&&v.localService)||voices.find(v=>v.lang.startsWith((S.lang||'en').split('-')[0]));
+if(preferred)u.voice=preferred;
+
+if(btn){
+currentSpeechBtn=btn;
+btn.textContent='⏹ Stop';
+btn.classList.add('speaking');
+}
+$('#audio-bar').classList.add('active');
+
+u.onend=()=>{stopSpeech()};
+u.onerror=()=>{stopSpeech()};
+
+speechSynthesis.speak(u);
+toast('🔊 Reading aloud (tap Stop to pause)');
+}
+
+$('#audio-stop-btn').onclick=stopSpeech;
+$('#audio-speed').onchange=e=>{speechRate=parseFloat(e.target.value)||1};
+
+// ============ VOICE INPUT ============
 function initSpeechRecognition(){
-if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window)){
-return null;
-}
+if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window))return null;
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 const rec=new SR();
 rec.lang=S.lang||navigator.language||'en-US';
 rec.interimResults=true;
 rec.continuous=false;
-rec.maxAlternatives=1;
 return rec;
 }
 
 async function startVoiceInput(){
 const micBtn=$('#mic');
-// Check if already recording
 if(recognition){recognition.stop();return}
 
-// Try Web Speech API first
 recognition=initSpeechRecognition();
 if(recognition){
 const ta=$('#in'),base=ta.value?ta.value.trimEnd()+' ':'';
 recognition.onstart=()=>{
 micBtn.classList.add('on');
 micBtn.style.background='var(--er)';
-micBtn.setAttribute('aria-label','Stop recording');
 toast('🎤 Listening... speak now');
 };
 recognition.onresult=e=>{
@@ -377,104 +559,83 @@ recognition.onend=()=>{
 recognition=null;
 micBtn.classList.remove('on');
 micBtn.style.background='';
-micBtn.setAttribute('aria-label','Voice input');
 };
 recognition.onerror=e=>{
 recognition=null;
 micBtn.classList.remove('on');
 micBtn.style.background='';
-if(e.error==='not-allowed'||e.error==='service-not-allowed'){
-toast('Microphone blocked. Allow access in browser settings.');
-}else if(e.error==='network'){
-toast('Speech recognition needs internet. Check connection.');
-}else if(e.error==='no-speech'){
-toast('No speech detected. Try again.');
-}else{
-toast('Voice error: '+e.error);
-}
+toast('Voice: '+(e.error==='not-allowed'?'Microphone blocked. Check browser settings.':'Speech ended'));
 };
-try{recognition.start()}catch{recognition=null;toast('Could not start voice input')}
+try{recognition.start()}catch{recognition=null}
 return;
 }
-
-// Fallback: Simple audio recording + send to Whisper if configured
-const groqProv=()=>S.prov.find(p=>/groq/i.test(p.url)&&p.key);
-if(groqProv()&&navigator.mediaDevices?.getUserMedia){
-try{
-toast('🎤 Recording... tap to stop');
-const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-const rec=new MediaRecorder(stream);
-const chunks=[];
-rec.ondataavailable=e=>chunks.push(e.data);
-rec.onstop=async()=>{
-stream.getTracks().forEach(t=>t.stop());
-micBtn.classList.remove('on');
-micBtn.style.background='';
-toast('Transcribing...');
-const blob=new Blob(chunks,{type:'audio/webm'});
-const form=new FormData();
-form.append('file',blob,'audio.webm');
-form.append('model','whisper-large-v3');
-try{
-const r=await robustFetch('https://api.groq.com/openai/v1/audio/transcriptions',{
-method:'POST',
-headers:{'Authorization':'Bearer '+groqProv().key},
-body:form
-},30000);
-const data=await r.json();
-if(data.text){
-const ta=$('#in');
-ta.value=(ta.value?ta.value.trimEnd()+' ':'')+data.text.trim();
-grow();meta();toast('Voice added');
+toast('Web speech recognition not supported. Try Google Chrome.');
 }
-}catch{toast('Transcription failed')}
+
+// ============ IMAGE GENERATION ENGINE ============
+async function generateImagePollinations(prompt,aspect,style){
+const ar=aspect||'1:1';
+const styled=style?prompt+', '+style:prompt;
+const encoded=encodeURIComponent(styled);
+const dims={'1:1':[1024,1024],'16:9':[1280,720],'9:16':[720,1280],'4:3':[1024,768],'3:4':[768,1024]}[ar]||[1024,1024];
+const seed=Math.floor(Math.random()*1000000);
+return `https://image.pollinations.ai/prompt/${encoded}?width=${dims[0]}&height=${dims[1]}&seed=${seed}&nologo=true&enhance=true`;
+}
+
+async function generateImageInChat(prompt,turnIdx){
+const turn=chat.turns[turnIdx];
+const imgCard={type:'image',prompt,status:'generating',url:''};
+turn.toolCard=imgCard;
+render();
+
+try{
+const url=await generateImagePollinations(prompt);
+const test=new Image();
+test.onload=()=>{
+imgCard.status='ready';
+imgCard.url=url;
+chatPut(chat);
+render();
 };
-rec.start();
-micBtn.classList.add('on');
-micBtn.style.background='var(--er)';
-const stopHandler=()=>{if(rec.state==='recording')rec.stop();micBtn.removeEventListener('click',stopHandler)};
-micBtn.addEventListener('click',stopHandler);
-return;
-}catch{/* Fall through */}
+test.onerror=()=>{
+imgCard.status='error';
+imgCard.err='Image generation service busy. Tap Redo to try again.';
+chatPut(chat);
+render();
+};
+test.src=url;
+}catch(e){
+imgCard.status='error';
+imgCard.err=e.message||'Failed to generate image';
+chatPut(chat);
+render();
+}
 }
 
-toast('Voice input not available. Add Groq API key or use Chrome.');
-}
-
-// ============ TEXT-TO-SPEECH (FIXED) ============
-function speakText(text){
-if(!('speechSynthesis'in window)){toast('Read aloud not supported');return}
-speechSynthesis.cancel();
-// Clean text for better speech
-const clean=text.replace(/```[\s\S]*?```/g,' code block ').replace(/[#*_|`]/g,'').slice(0,8000);
-const u=new SpeechSynthesisUtterance(clean);
-u.lang=S.lang||navigator.language;
-u.rate=1;
-u.pitch=1;
-// Try to find a good voice
-const voices=speechSynthesis.getVoices();
-const preferred=voices.find(v=>v.lang.startsWith((S.lang||'en').split('-')[0])&&v.localService);
-if(preferred)u.voice=preferred;
-speechSynthesis.speak(u);
-toast('🔊 Reading aloud');
-}
-
-// ============ CHAT API (FIXED with better error handling) ============
-const NONCHAT=/embed|whisper|tts|guard|moderat|content[-_ ]?safety|rerank|robotic|translate|transcri|speech|(?:^|[-_/])(?:image|flux|sdxl|stable[-_ ]?diffusion|veo|lyria)(?:$|[-_/:])/i;
-const chatReady=m=>m&&!NONCHAT.test(m);
-const models=p=>(p.models||'').split(/[,\n]/).map(s=>s.trim()).filter(chatReady);
-
+// ============ CHAT API CALLS ============
 async function callChatAPI(provider,model,messages,maxTokens=2000){
+if(/pollinations\.ai/i.test(provider.url)){
+const cleanMessages=messages.map(m=>({role:m.role,content:typeof m.content==='string'?m.content:JSON.stringify(m.content)}));
+const r=await robustFetch('https://text.pollinations.ai/',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({messages:cleanMessages,model:model||'openai',seed:Math.floor(Math.random()*100000)})
+},45000);
+if(!r.ok)throw new Error('Pollinations Free AI busy ('+r.status+')');
+const text=await r.text();
+return{ok:true,text};
+}
+
 const body={model,messages,max_tokens:maxTokens,stream:true};
 const headers={'Content-Type':'application/json'};
 if(provider.key)headers.Authorization='Bearer '+provider.key;
 
-// For Gemini, use their native API format if OpenAI-compatible fails
+// If Gemini native URL
 if(/generativelanguage\.googleapis/i.test(provider.url)){
 try{
 return await callGeminiNative(provider,model,messages,maxTokens);
 }catch(e){
-// Fall back to OpenAI-compatible endpoint
+// Fall through
 }
 }
 
@@ -482,13 +643,13 @@ const r=await robustFetch(provider.url.replace(/\/$/,'')+'/chat/completions',{
 method:'POST',
 headers,
 body:JSON.stringify(body)
-},45000);
+},40000);
 
 if(!r.ok){
-if(r.status===401)throw new Error('Invalid API key. Check Settings.');
-if(r.status===429)throw new Error('Rate limited. Wait a moment.');
-if(r.status===404)throw new Error('Model not found. Try Fetch Models.');
-throw new Error('API error: '+r.status);
+if(r.status===401)throw new Error('Invalid API key for '+provider.name);
+if(r.status===429)throw new Error('Rate limit reached (429). Retrying next model...');
+if(r.status===404)throw new Error('Model "'+model+'" not found (404)');
+throw new Error('API Error: '+r.status);
 }
 
 return r;
@@ -496,8 +657,9 @@ return r;
 
 async function callGeminiNative(provider,model,messages,maxTokens){
 const key=provider.key;
-const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-// Convert OpenAI format to Gemini format
+const cleanModel=model.replace(/^models\//,'');
+const url=`https://generativelanguage.googleapis.com/v1beta/models/${cleanModel}:generateContent?key=${key}`;
+
 const contents=messages.filter(m=>m.role!=='system').map(m=>{
 if(Array.isArray(m.content)){
 const parts=[];
@@ -512,69 +674,62 @@ return{role:m.role==='assistant'?'model':'user',parts:parts.length?parts:[{text:
 }
 return{role:m.role==='assistant'?'model':'user',parts:[{text:typeof m.content==='string'?m.content:JSON.stringify(m.content)}]};
 });
+
 const sysMsg=messages.find(m=>m.role==='system');
-const body={contents,maxOutputTokens:maxTokens};
+const body={contents,generationConfig:{maxOutputTokens:maxTokens}};
 if(sysMsg)body.systemInstruction={parts:[{text:sysMsg.content}]};
 
 const r=await tryFetch(url,{
 method:'POST',
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify(body)
-},45000);
-if(!r.ok)throw new Error('Gemini API error: '+r.status);
+},40000);
+
+if(!r.ok){
+const errJson=await r.json().catch(()=>({}));
+const errMsg=errJson.error?.message||('Gemini Error '+r.status);
+throw new Error(errMsg);
+}
+
 const data=await r.json();
-// Convert back to stream-like format
 const text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
 return{ok:true,text};
 }
 
-// ============ SMART MODEL SELECTION ============
+// ============ SMART MODEL SCORER ============
 function scoreModel(key,provider,model,type='general'){
 let score=0;
 const health=S.h[key]||{};
-// Prefer models with good history
-if(health.ok)score-=Math.min(health.ok,5)*0.2;
-if(health.f)score+=health.f*2;
-if(health.ms)score+=health.ms/12000;
-// Prefer larger models for complex tasks
-if(/70b|405b|gpt-4|claude|opus|gemini-3|deepseek/i.test(model))score-=0.5;
-// Penalize experimental
-if(/preview|alpha|beta|experimental/i.test(model))score+=1;
-// Type-specific
-if(type==='code'&&/coder|code|devstral/i.test(model))score-=2;
-if(type==='research'&&/search|sonar/i.test(model))score-=1.5;
-return score+Math.random()*0.3;
+
+if(health.ok)score-=Math.min(health.ok,5)*0.3;
+if(health.f)score+=health.f*3;
+if(health.ms)score+=health.ms/15000;
+
+// Production Grade Models
+if(/gemini-2\.0-flash|gemini-1\.5-flash|llama-3\.3-70b|deepseek-chat|gpt-4o-mini/i.test(model))score-=3.0;
+else if(/70b|405b|gpt-4|claude-3-5|deepseek-reasoner|pro/i.test(model))score-=1.5;
+
+// Heavy penalty for experimental/unsupported models
+if(/live|realtime|preview|alpha|beta|experimental|test|deprecated/i.test(model))score+=6.0;
+
+// Type-specific affinity
+if(type==='code'&&/coder|code|devstral|qwen-2\.5-coder/i.test(model))score-=2.5;
+if(type==='research'&&/search|sonar|deepseek-reasoner/i.test(model))score-=2.0;
+
+return score+Math.random()*0.1;
 }
 
 function getModelPool(type='general'){
 const pool=[];
 for(const p of S.prov){
-if(!p.key)continue;
+if(!p.key&&!/pollinations/i.test(p.url))continue;
 for(const m of models(p)){
 const k=p.id+'|'+m;
-// Skip temporarily blocked models
 if(S.h[k]?.u&&S.h[k].u>Date.now())continue;
 pool.push({k,p,m,score:scoreModel(k,p,m,type)});
 }
 }
 return pool.sort((a,b)=>a.score-b.score);
-}
-
-async function tryModels(pool,fn,maxAttempts=4){
-let lastErr;
-for(let i=0;i<Math.min(maxAttempts,pool.length);i++){
-const item=pool[i];
-try{
-const t0=Date.now();
-const result=await fn(item.p,item.m);
-noteHealth(item.k,true,Date.now()-t0);
-return{result,k:item.k};
-}catch(e){
-noteHealth(item.k,false,0,e);
-lastErr=e;
-}
-}
-throw lastErr||new Error('All models failed');
 }
 
 function noteHealth(k,ok,ms,e){
@@ -584,139 +739,73 @@ else{h.f++;h.u=Date.now()+(e==='Invalid API key'?864e5:Math.min(60000*h.f,18e5))
 kvSet('health',S.h);
 }
 
-// ============ IMAGE GENERATION UI (FIXED) ============
-let imgGenController=null;
-
-async function generateImage(){
-const prompt=$('#ip').value.trim();
-if(!prompt)return toast('Describe the image first');
-const aspect=$('#iar').value;
-const style=$('#istyle').value;
-const btn=$('#ig'),box=$('#ir');
-btn.disabled=true;
-btn.textContent='Generating...';
-
-// Cancel previous if any
-if(imgGenController)imgGenController.abort();
-imgGenController=new AbortController();
-
-box.innerHTML=`
-<div class="status"><div class="spin"></div> Generating image...</div>
-<div class="prog"><div id="iprog" style="width:20%"></div></div>
-<p class="mu" style="font-size:12px">This usually takes 5-15 seconds</p>
-`;
-
-// Animate progress
-let prog=20;
-const progTimer=setInterval(()=>{
-prog=Math.min(prog+Math.random()*10,90);
-const el=$('#iprog');if(el)el.style.width=prog+'%';
-},1000);
-
-try{
-let imageUrl;
-
-// Method 1: Pollinations (fastest, no key)
-try{
-imageUrl=await generateImagePollinations(prompt,aspect,style);
-// Verify it loads
-const testImg=new Image();
-testImg.onload=()=>{clearInterval(progTimer);showGeneratedImage(imageUrl,prompt,btn,box)};
-testImg.onerror=()=>{throw new Error('Pollinations failed')};
-testImg.src=imageUrl;
-// Timeout fallback
-setTimeout(()=>{if(btn.disabled)tryProviderFallback()},20000);
-return;
-}catch{/* Fall through */}
-
-// Method 2: Provider APIs
-await tryProviderFallback();
-
-async function tryProviderFallback(){
-const imgProviders=S.prov.filter(p=>p.key&&p.images?.length);
-for(const p of imgProviders){
-for(const m of p.images.slice(0,3)){
-try{
-imageUrl=await generateImageProvider(prompt,aspect,style,p,m);
-clearInterval(progTimer);
-showGeneratedImage(imageUrl,prompt,btn,box);
-return;
-}catch{/* Try next */}
-}
-}
-throw new Error('All image sources failed');
-}
-}catch(e){
-clearInterval(progTimer);
-box.innerHTML=`<i class="er">Failed: ${esc(e.message)}</i><p class="mu" style="font-size:12px">Try: simpler prompt, different style, or check internet</p>`;
-}finally{
-btn.disabled=false;
-btn.textContent='Generate';
-imgGenController=null;
-}
-}
-
-function showGeneratedImage(url,prompt,btn,box){
-const progEl=$('#iprog');if(progEl)progEl.style.width='100%';
-box.innerHTML=`
-<img src="${esc(url)}" alt="Generated: ${esc(prompt.slice(0,50))}" style="margin-top:10px">
-<small class="mu">Generated successfully</small>
-<div class="r" style="margin-top:8px">
-<button id="idown">📥 Download</button>
-<button id="iuse" class="p">💬 Use in chat</button>
-</div>
-`;
-$('#idown').onclick=async()=>{
-try{
-if(url.startsWith('data:')){
-const a=document.createElement('a');a.href=url;a.download='ai-image.png';a.click();
-}else{
-const r=await fetch(url);const b=await r.blob();
-const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ai-image.jpg';a.click();
-setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-toast('Downloaded');
-}catch{window.open(url,'_blank')}
-};
-$('#iuse').onclick=async()=>{
-try{
-if(url.startsWith('data:')){setImg(url)}
-else{
-const r=await fetch(url);const b=await r.blob();
-const fr=new FileReader();fr.onload=()=>setImg(fr.result);fr.readAsDataURL(b);
-}
-$('#di').close();toast('Image attached to chat');
-}catch{toast('Download the image, then attach it manually')}
-};
-}
-
-// ============ CHAT LOGIC ============
-const newChat=()=>chat={id:Date.now()+'',title:'New chat',t:Date.now(),sys:'',turns:[]};
+// ============ CHAT STATE & RENDERING ============
+const newChat=()=>chat={id:Date.now()+'',title:'New chat',t:Date.now(),turns:[]};
 const label=k=>{const i=k.indexOf('|'),p=S.prov.find(x=>x.id==k.slice(0,i));return k.slice(i+1).split('/').pop().replace(':free','')+' · '+(p?p.name:'?')};
 
 function render(){
 $('#ti').textContent=chat.title;
 const n=chat.turns.length-1;
+
 $('#msgs').innerHTML=chat.turns.map((t,i)=>`
 <section class="msg">
 <div class="u">${t.img&&t.img.startsWith('data:image/')?`<img src="${esc(t.img)}" alt="Attached image" loading="lazy">`:''}${t.doc?`<small>📄 ${esc(t.doc.name)}</small>`:''}${esc(t.u)}</div>
 <div class="ac">
-<button class="act" data-cq="${i}">Copy</button>
-${i==n?'<button class="act" data-ed>Edit</button>':''}
-<button class="act" data-del="${i}">Delete</button>
+<button class="act" data-cq="${i}">📋 Copy</button>
+${i==n?'<button class="act" data-ed>✏️ Edit</button>':''}
+<button class="act" data-del="${i}">🗑️ Delete</button>
 </div>
+
+${t.toolCard?renderToolCard(t.toolCard,i):''}
+
 ${t.a.map((a,j)=>`
 <article class="a${a.kind=='final'?' f':a.kind?' rv':''}" data-t="${i}" data-j="${j}">
-<small>${esc(a.m)}</small>
+<small class="model-tag">${esc(a.m)}</small>
 <div class="b">${body(a)}</div>
 ${a.try?'':`<div class="ac">
-<button class="act" data-cp>Copy</button>
+<button class="act" data-cp>📋 Copy</button>
 <button class="act" data-sp>🔊 Read</button>
-${i==n&&j==t.a.length-1?'<button class="act" data-rg>Regenerate</button>':''}
+${i==n&&j==t.a.length-1?'<button class="act" data-rg>🔄 Regenerate</button>':''}
 </div>`}
 </article>`).join('')}
-</section>`).join('')||'<div class="em"><h2>How can I help?</h2><div>'+['Explain a topic','Write code','Plan my day','Check my idea'].map(x=>`<button data-sg="${x}">${x}</button>`).join('')+'</div></div>';
-requestAnimationFrame(()=>{$('#msgs').scrollTop=1e9;scrollState()});meta();
+</section>`).join('')||`
+<div class="em">
+<h2>AI Hub Universal Assistant</h2>
+<p>Multi-model reasoning, live image generation, file generation & smart routing.</p>
+<div class="quick-chips">
+<button data-sg="Explain the reality and tools for making a 30-second AI video">🎬 30s AI Video Guide</button>
+<button data-sg="draw a futuristic electric supercar in neon rain photorealistic">🎨 Create AI Image</button>
+<button data-sg="Write a complete Python script to generate and save CSV files">🐍 Python File Script</button>
+<button data-sg="Help me build and plan my software project architecture">💡 Plan My Project</button>
+</div>
+</div>`;
+
+requestAnimationFrame(()=>{$('#msgs').scrollTop=1e9;scrollState()});
+meta();
+}
+
+function renderToolCard(card,turnIdx){
+if(card.type==='image'){
+if(card.status==='generating'){
+return `<div class="chat-tool-card"><div class="status"><div class="spin"></div> Generating live AI image...</div><div class="prog"><div style="width:60%"></div></div></div>`;
+}
+if(card.status==='ready'){
+return `<div class="chat-tool-card">
+<img src="${esc(card.url)}" alt="${esc(card.prompt)}" onclick="$('#ivi').src=this.src;$('#iv').showModal()">
+<div class="card-meta">
+<span>🎨 ${esc(card.prompt.slice(0,55))}...</span>
+<div>
+<button class="act" data-img-down="${esc(card.url)}">📥 Download</button>
+<button class="act" data-img-regen="${turnIdx}">🔄 Redo</button>
+</div>
+</div>
+</div>`;
+}
+if(card.status==='error'){
+return `<div class="chat-tool-card"><i class="er">${esc(card.err)}</i><button class="act" data-img-regen="${turnIdx}" style="margin-top:6px">🔄 Retry Image</button></div>`;
+}
+}
+return '';
 }
 
 function body(a){
@@ -753,7 +842,8 @@ function md(t){
 return t.split('```').map((p,i)=>{
 if(i%2){
 const n=p.indexOf('\n'),has=n>=0,g=esc((has?p.slice(0,n):'').trim().slice(0,24))||'code',code=has?p.slice(n+1):p;
-return `<div class="cb"><div class="ch"><span>${g}</span><button class="act" data-cc>Copy</button></div><pre><code>${esc(code)}</code></pre></div>`;
+const isPreviewable=/^(html|svg|xml)/i.test(g);
+return `<div class="cb"><div class="ch"><span>${g}</span><div class="ch-acts">${isPreviewable?`<button class="act" data-previewcode="${encodeURIComponent(code)}">▶️ Preview</button>`:''}<button class="act" data-savecode="${encodeURIComponent(code)}" data-ext="${g}">💾 Save</button><button class="act" data-cc>📋 Copy</button></div></div><pre><code>${esc(code)}</code></pre></div>`;
 }
 return inl(p);
 }).join('');
@@ -771,24 +861,31 @@ if(x)m.push({role:'assistant',content:x.c});
 return m;
 };
 
+// ============ EXECUTE CHAT ============
 async function run(ch,ti,j,u){
 const a=ch.turns[ti].a[j],i=a.k.indexOf('|'),p=S.prov.find(x=>x.id==a.k.slice(0,i)),model=a.k.slice(i+1);
-if(!p){a.err='Provider removed';return}
+if(!p){a.err='Provider not configured';return}
+
 const c=new AbortController();ctrl.push(c);
 let timeout;
-const resetTimeout=()=>{clearTimeout(timeout);timeout=setTimeout(()=>{a.to=1;c.abort()},40000)};
+const resetTimeout=()=>{clearTimeout(timeout);timeout=setTimeout(()=>{a.to=1;c.abort()},45000)};
 resetTimeout();
+
 const curTurn=ch.turns[ti];
 let promptText=u||curTurn.u;
 if(!u&&curTurn.doc?.text)promptText=`[Document: ${curTurn.doc.name}]\n\`\`\`\n${curTurn.doc.text}\n\`\`\`\n\n${promptText}`;
+
 let userMsg={role:'user',content:promptText};
 if(!u&&curTurn.img&&curTurn.img.startsWith('data:image/')){
 userMsg={role:'user',content:[{type:'text',text:promptText},{type:'image_url',image_url:{url:curTurn.img}}]};
 }
+
 const msgs=[...hist(ch,ti),userMsg];
+const inputTokens=estimateTokens(JSON.stringify(msgs));
+const safeMaxTokens=S.saver?800:S.detail=='detailed'?2600:1800;
+
 try{
-const r=await callChatAPI(p,model,msgs,S.saver?900:S.detail=='detailed'?2600:1700);
-// Handle streaming
+const r=await callChatAPI(p,model,msgs,safeMaxTokens);
 if(r.body){
 const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
 for(;;){
@@ -803,13 +900,12 @@ try{a.c+=JSON.parse(d).choices?.[0]?.delta?.content||''}catch{}
 paint(ch,ti,j);
 }
 }else if(r.text){
-// Non-streaming (Gemini native)
 a.c=r.text;paint(ch,ti,j);
 }
 }catch(e){
 if(e.name==='AbortError'){
 if(halt)a.c+='(stopped)';
-else{a.c='';a.err=a.to?'Model timed out. Try again.':'Cancelled'}
+else{a.c='';a.err=a.to?'Request timed out. Try again.':'Cancelled'}
 }else{
 a.c='';a.err=e.message||'Request failed';
 }
@@ -817,47 +913,80 @@ a.c='';a.err=e.message||'Request failed';
 clearTimeout(timeout);paint(ch,ti,j);
 }
 
+// ============ SMART AUTO-ROUTER ============
 async function auto(ch,ti){
-const t=ch.turns[ti],f={k:'',m:'Working...',c:'',kind:'final',try:1};
+const t=ch.turns[ti],f={k:'',m:'Analyzing task...',c:'',kind:'final',try:1};
 t.a.push(f);render();
+
 const pool=getModelPool();
-if(!pool.length){f.err='No working API key. Add one in Settings (⚙️).';delete f.try;render();return}
-const type=/\b(code|bug|debug|javascript|python|html|css|api|function|program)\b/i.test(t.u)?'code':/\b(research|latest|current|today|news|price|source|evidence)\b/i.test(t.u)?'research':'general';
+if(!pool.length){
+f.err='No working API key found. Add Google Gemini, Groq, or OpenRouter in Settings (⚙️).';
+delete f.try;
+render();
+return;
+}
+
+const isCode=/\b(code|bug|debug|javascript|python|html|css|api|function|script|sql)\b/i.test(t.u);
+const isResearch=/\b(research|pricing|compare|latest|current|news|evidence|data)\b/i.test(t.u);
+const type=isCode?'code':isResearch?'research':'general';
+
 const typedPool=getModelPool(type);
 const usePool=typedPool.length?typedPool:pool;
+let errors=[];
+
 for(let i=0;i<Math.min(4,usePool.length);i++){
 const item=usePool[i];
 f.k=item.k;f.c='';delete f.err;delete f.to;
-f.m='Trying '+item.m.split('/').pop()+'...';
+f.m='Connecting to '+item.m.split('/').pop()+'...';
 render();
+
 const t0=Date.now();
 await run(ch,ti,t.a.indexOf(f));
+
 if(f.c&&!f.err&&!f.to){
 noteHealth(item.k,true,Date.now()-t0);
-f.m='Answer · '+label(item.k).split(' · ')[0];
-delete f.try;render();return;
-}
-noteHealth(item.k,false,0,f.err);
-}
+f.m=label(item.k).split(' · ')[0];
 delete f.try;
-if(!f.c)f.err='All models busy. Wait a minute and try again.';
+render();
+return;
+}
+
+noteHealth(item.k,false,0,f.err);
+errors.push(`${item.m.split('/').pop()}: ${f.err||'Failed'}`);
+}
+
+delete f.try;
+f.err='All available models reported errors:\n'+errors.join('\n')+'\n\nPlease verify your API key in Settings (⚙️).';
 render();
 }
 
+// ============ SEND MESSAGE ============
 async function send(){
 const ta=$('#in'),text=ta.value.trim()||(pend?'Describe this image.':pendDoc?'Summarize this file.':'');
 if(!text||busy)return;
-if(!S.auto&&!S.sel.length){toast('Pick a model in Models (🤖)');$('#dm').showModal();return}
+
+// Intent check: Image generation request
+const imgMatch=text.match(/^(?:\/image\s+|draw\s+|generate\s+(?:an?\s+)?image\s+(?:of\s+)?|create\s+(?:an?\s+)?picture\s+(?:of\s+)?)(.*)/i);
+
 const ch=chat,turn={u:text,img:pend||undefined,doc:pendDoc||undefined,a:S.auto?[]:S.sel.map(k=>({k,m:label(k),c:''}))};
 ch.turns.push(turn);
+const turnIdx=ch.turns.length-1;
+
 if(ch.turns.length==1)ch.title=text.slice(0,40);
 ta.value='';grow();setImg('');setDoc(null);render();
-busy=true;$('#go').textContent='Stop';halt=false;
-if(S.auto)await auto(ch,ch.turns.length-1);
-else{
-await Promise.all(turn.a.map((_,j)=>run(ch,ch.turns.length-1,j)));
-if(S.team&&!halt)await team(ch,ch.turns.length-1);
+
+if(imgMatch&&imgMatch[1]){
+generateImageInChat(imgMatch[1].trim(),turnIdx);
 }
+
+busy=true;$('#go').textContent='Stop';halt=false;
+
+if(S.auto)await auto(ch,turnIdx);
+else{
+await Promise.all(turn.a.map((_,j)=>run(ch,turnIdx,j)));
+if(S.team&&!halt)await team(ch,turnIdx);
+}
+
 busy=false;ctrl=[];$('#go').textContent='Send';
 ch.t=Date.now();await chatPut(ch);
 }
@@ -868,10 +997,10 @@ if(d.length<2||halt)return;
 const blk=d.map((a,i)=>`Answer ${String.fromCharCode(65+i)}:\n${a.c}`).join('\n\n');
 const rv=d.map(a=>({k:a.k,m:'Review',c:'',kind:'review'}));
 t.a.push(...rv);render();
-await Promise.all(rv.map(a=>run(ch,ti,t.a.indexOf(a),'Review these answers and identify the best one:\n'+blk)));
+await Promise.all(rv.map(a=>run(ch,ti,t.a.indexOf(a),'Review these answers and compare:\n'+blk)));
 if(halt)return;
-t.a.push({k:S.sel[0],m:'Final',c:'',kind:'final'});render();
-await run(ch,ti,t.a.length-1,'Combine the best answers:\n'+blk+'\n\nReviews:\n'+rv.map(a=>a.c).join('\n'));
+t.a.push({k:S.sel[0],m:'Synthesized Final',c:'',kind:'final'});render();
+await run(ch,ti,t.a.length-1,'Combine into the single best comprehensive answer:\n'+blk+'\n\nReviews:\n'+rv.map(a=>a.c).join('\n'));
 }
 
 // ============ FILE HANDLING ============
@@ -883,17 +1012,17 @@ const dataBytes=d=>Math.max(0,Math.round((d.length-(d.indexOf(',')+1))*3/4));
 async function pick(f){
 if(!f)return;
 if(!f.type.startsWith('image/')){
-if(f.size>120000)return toast('Text files must be under 120 KB');
+if(f.size>200000)return toast('Text file size limit: 200 KB');
 try{
 let text=await f.text();
-text=text.replace(/\0/g,'').slice(0,60000);
+text=text.replace(/\0/g,'').slice(0,80000);
 if(!text.trim())throw 0;
 setDoc({name:f.name.slice(0,100),text});
 toast('File attached');
-}catch{return toast('Choose an image or text file')}
+}catch{return toast('Choose a valid text/code file')}
 return;
 }
-if(f.size>25e6)return toast('Image too large (max 25 MB)');
+if(f.size>25e6)return toast('Image max size: 25 MB');
 try{
 const b=await createImageBitmap(f,{imageOrientation:'from-image'});
 const lim=S.saver?768:1024,k=Math.min(1,lim/Math.max(b.width,b.height));
@@ -904,29 +1033,27 @@ const x=c.getContext('2d',{alpha:false});
 x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);
 x.drawImage(b,0,0,c.width,c.height);
 b.close?.();
-let q=S.saver?.62:.76,d=c.toDataURL('image/webp',q);
-if(!d.startsWith('data:image/webp'))d=c.toDataURL('image/jpeg',q);
-while(dataBytes(d)>(S.saver?110000:220000)&&q>.42){q-=.08;d=c.toDataURL(d.startsWith('data:image/webp')?'image/webp':'image/jpeg',q)}
+let q=S.saver?.65:.80,d=c.toDataURL('image/jpeg',q);
 setImg(d);
 toast('Image attached');
-}catch{toast('Unsupported image format. Try JPG, PNG, WebP.')}
+}catch{toast('Unsupported image format')}
 }
 
 // ============ PROVIDER MANAGEMENT ============
 function rp(){
 $('#pl').innerHTML=S.prov.map((p,i)=>`
 <div class="card">
-<input data-i="${i}" data-f="name" value="${esc(p.name)}" placeholder="Name">
+<input data-i="${i}" data-f="name" value="${esc(p.name)}" placeholder="Provider Name">
 <input data-i="${i}" data-f="url" value="${esc(p.url)}" placeholder="Base URL">
-<input type="password" data-i="${i}" data-f="key" value="${esc(p.key)}" placeholder="API key">
+<input type="password" data-i="${i}" data-f="key" value="${esc(p.key)}" placeholder="API Key">
 ${p.keyUrl?`<small class="mu" style="font-size:11px">Get key: <a href="${p.keyUrl}" target="_blank">${p.keyUrl}</a></small>`:''}
 <textarea rows="2" data-i="${i}" data-f="models" placeholder="Model IDs (comma separated)">${esc(p.models)}</textarea>
-${p.total?`<small class="mu">${models(p).length} chat models</small>`:''}
+${p.total?`<small class="mu">${models(p).length} verified models</small>`:''}
 <div class="r">
-<button data-fe="${i}">Fetch models</button>
+<button data-fe="${i}">Fetch Models</button>
 <button data-rm="${i}" style="color:var(--er)">Remove</button>
 </div>
-</div>`).join('')||'<p class="mu">No providers. Add one below.</p>';
+</div>`).join('')||'<p class="mu">No providers configured yet. Add one below.</p>';
 }
 
 $('#pl').oninput=e=>{
@@ -959,19 +1086,19 @@ const j=await r.json();
 const raw=j.data||j.models||[];
 let ids=raw.map(x=>(x.id||x.name||'').replace(/^models\//,'')).filter(Boolean);
 if(/openrouter/i.test(p.url))ids=ids.filter(i=>i.endsWith(':free'));
-p.images=ids.filter(id=>/flux|image|sdxl|stable|diffusion/i.test(id));
 const total=ids.length;
 ids=ids.filter(chatReady);
-p.total=total;p.models=ids.join(', ');p.f=Date.now();
+p.total=total;p.models=ids.join(', ');
 await save();rp();
-toast(ids.length+' models loaded');
+toast(ids.length+' chat models ready');
 }catch(x){toast('Fetch failed: '+x.message)}
 }
 };
 
 $('#ap').onclick=()=>{
 const n=$('#pp').value;
-S.prov.push({id:Date.now().toString(36),name:n,url:PRE[n].url,model:PRE[n].model,key:'',models:PRE[n].model,keyUrl:PRE[n].keyUrl});
+const def=PRE[n]||{url:'',model:'',keyUrl:''};
+S.prov.push({id:Date.now().toString(36),name:n,url:def.url,model:def.model,key:'',models:def.model,keyUrl:def.keyUrl});
 save();rp();
 };
 
@@ -980,10 +1107,16 @@ $('#in').oninput=()=>{grow();meta()};
 $('#in').onkeydown=e=>{if(e.key=='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();busy?toast('Wait or tap Stop'):send()}};
 $('#at').onclick=()=>$('#fl').click();
 $('#bi').onclick=()=>{$('#di').showModal();setTimeout(()=>$('#ip').focus(),100)};
-$('#ig').onclick=generateImage;
+$('#bv').onclick=()=>{$('#dv').showModal()};
 $('#fl').onchange=e=>{pick(e.target.files[0]);e.target.value=''};
 $('#mic').onclick=startVoiceInput;
 $('#go').onclick=()=>busy?(halt=true,ctrl.forEach(c=>c.abort()),toast('Stopping...')):send();
+
+$('#b-make-vprompt').onclick=()=>{
+$('#dv').close();
+$('#in').value="I want to create a 30-second AI video. Break it down into 6 distinct 5-second scenes with detailed prompts, camera angles, transitions, and free tool instructions for Kling AI and Luma Dream Machine.";
+grow();meta();send();
+};
 
 $('#pv').onclick=e=>{
 if(e.target.id==='rm2'){setImg('');setDoc(null)}
@@ -1005,16 +1138,33 @@ document.addEventListener('click',e=>{if(e.target.classList.contains('x'))e.targ
 
 $('#msgs').onclick=e=>{
 const D=e.target.dataset,tl=chat.turns.length-1;
-if(D.sg){$('#in').value=D.sg+': ';$('#in').focus();grow();return}
+if(D.sg){$('#in').value=D.sg;$('#in').focus();grow();return}
 if(D.cc!==undefined){copyText(e.target.closest('.cb').querySelector('code').textContent);return}
 if(D.cq!==undefined){copyText(chat.turns[D.cq].u);return}
+if(D.previewcode!==undefined){
+const code=decodeURIComponent(D.previewcode);
+$('#dpv-frame').srcdoc=code;
+$('#dpv').showModal();
+return;
+}
+if(D.savecode!==undefined){
+const code=decodeURIComponent(D.savecode),ext=D.ext||'txt';
+downloadFile(code,`file.${ext.toLowerCase()}`);
+return;
+}
+if(D.imgDown){downloadImage(D.imgDown);return}
+if(D.imgRegen!==undefined){
+const t=chat.turns[+D.imgRegen];
+if(t?.toolCard?.prompt)generateImageInChat(t.toolCard.prompt,+D.imgRegen);
+return;
+}
 if(D.ed!==undefined&&!busy){
 const u=chat.turns[tl].u;
 setImg(chat.turns[tl].img||'');setDoc(chat.turns[tl].doc||null);
 chat.turns.pop();chatPut(chat);render();
 $('#in').value=u;grow();$('#in').focus();return;
 }
-if(D.del!==undefined&&!busy&&confirm('Delete this?')){
+if(D.del!==undefined&&!busy&&confirm('Delete message?')){
 chat.turns.splice(+D.del,1);chatPut(chat);render();return;
 }
 if(D.rg!==undefined&&!busy){
@@ -1025,7 +1175,7 @@ $('#in').value=u;send();return;
 }
 if(D.sp!==undefined){
 const d=e.target.closest('.a').dataset;
-speakText(chat.turns[d.t].a[d.j].c);return;
+speakText(chat.turns[d.t].a[d.j].c,e.target);return;
 }
 if(D.cp!==undefined){
 const d=e.target.closest('.a').dataset;
@@ -1040,8 +1190,56 @@ const x=document.createElement('textarea');
 x.value=t;x.style.position='fixed';x.style.opacity=0;
 document.body.append(x);x.select();document.execCommand('copy');x.remove();
 }
-toast('Copied');
+toast('Copied to clipboard');
 }
+
+function downloadFile(content,filename){
+const a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'}));
+a.download=filename;
+a.click();
+setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+toast('File saved');
+}
+
+async function downloadImage(url){
+try{
+const r=await fetch(url);const b=await r.blob();
+const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ai-image.jpg';a.click();
+setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+toast('Image downloaded');
+}catch{window.open(url,'_blank')}
+}
+
+// ============ IMAGE GENERATOR MODAL ============
+$('#ig').onclick=async()=>{
+const prompt=$('#ip').value.trim();
+if(!prompt)return toast('Describe the image first');
+const aspect=$('#iar').value,style=$('#istyle').value;
+const btn=$('#ig'),box=$('#ir');
+btn.disabled=true;btn.textContent='Generating...';
+box.innerHTML=`<div class="status"><div class="spin"></div> Generating image...</div><div class="prog"><div style="width:70%"></div></div>`;
+
+try{
+const url=await generateImagePollinations(prompt,aspect,style);
+const img=new Image();
+img.onload=()=>{
+box.innerHTML=`<img src="${esc(url)}" alt="Generated Image" style="margin-top:10px"><div class="r" style="margin-top:8px"><button id="mdl">📥 Download</button><button id="muse" class="p">💬 Insert in Chat</button></div>`;
+$('#mdl').onclick=()=>downloadImage(url);
+$('#muse').onclick=async()=>{
+$('#di').close();
+$('#in').value="Look at this generated image: "+prompt;
+setImg(url);grow();meta();
+};
+btn.disabled=false;btn.textContent='Generate Image';
+};
+img.onerror=()=>{throw new Error('Image creation failed')};
+img.src=url;
+}catch(e){
+box.innerHTML=`<i class="er">Generation failed: ${esc(e.message)}</i>`;
+btn.disabled=false;btn.textContent='Generate Image';
+}
+};
 
 // ============ MODELS DIALOG ============
 function rm(){
@@ -1078,7 +1276,7 @@ $('#cl').innerHTML=all.map(c=>`
 <span data-o="${c.id}" style="cursor:pointer">${esc(c.title)}</span>
 <button data-d="${c.id}" style="color:var(--er);padding:4px 8px;font-size:12px">Delete</button>
 </div>
-`).join('')||'<p class="mu">No chats yet.</p>';
+`).join('')||'<p class="mu">No chats saved yet.</p>';
 }
 
 $('#bc').onclick=()=>{rc();$('#dc').showModal()};
@@ -1087,7 +1285,7 @@ $('#nc').onclick=()=>{newChat();render();$('#dc').close()};
 $('#cl').onclick=async e=>{
 const d=e.target.dataset;
 if(d.o){chat=await chatGet(d.o)||newChat();render();$('#dc').close()}
-if(d.d&&confirm('Delete this chat?')){
+if(d.d&&confirm('Delete chat?')){
 await chatDel(d.d);
 if(chat.id==d.d){newChat();render()}
 rc();
@@ -1108,7 +1306,7 @@ $('#ds').showModal();
 
 $('#th').onchange=e=>{S.th=e.target.value;kvSet('th',S.th);document.documentElement.dataset.th=S.th};
 $('#lg').onchange=e=>{S.lang=e.target.value;kvSet('lang',S.lang)};
-$('#pr').onchange=e=>{S.profile=e.target.value;kvSet('profile',S.profile);toast('Style updated')};
+$('#pr').onchange=e=>{S.profile=e.target.value;kvSet('profile',S.profile);toast('Persona updated')};
 $('#detail').onchange=e=>{S.detail=e.target.value;kvSet('detail',S.detail)};
 $('#dsav').onchange=e=>{S.saver=e.target.checked;kvSet('saver',S.saver)};
 
@@ -1119,20 +1317,14 @@ lines.push('## You','',t.u,'');
 if(t.doc)lines.push('_Attached: '+t.doc.name+'_','');
 for(const a of t.a)if(a.c){lines.push('## '+a.m,'',a.c,'')}
 }
-const a=document.createElement('a');
-a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/markdown'}));
-a.download=(chat.title.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,50)||'chat')+'.md';
-a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+downloadFile(lines.join('\n'),(chat.title.replace(/[^a-z0-9]+/gi,'-').slice(0,40)||'chat')+'.md');
 };
 
 $('#ex').onclick=async()=>{
-const k=confirm('Include API keys in backup?\nOK = include, Cancel = exclude');
+const k=confirm('Include API keys in backup JSON?\nOK = include, Cancel = exclude');
 const prefs={profile:S.profile,detail:S.detail,th:S.th,lang:S.lang,saver:S.saver,auto:S.auto,team:S.team};
 const d={v:3,prefs,sel:S.sel,prov:S.prov.map(p=>k?p:{...p,key:''}),chats:await chatAll()};
-const a=document.createElement('a');
-a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));
-a.download='ai-hub-backup.json';
-a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+downloadFile(JSON.stringify(d),'ai-hub-backup.json');
 };
 
 $('#im').onclick=()=>$('#fi').click();
@@ -1148,7 +1340,7 @@ else if(!x.key&&p.key)x.key=p.key;
 if(d.prefs)for(const k of['profile','detail','th','lang','saver','auto','team'])
 if(d.prefs[k]!==undefined){S[k]=d.prefs[k];await kvSet(k,S[k])}
 if(Array.isArray(d.sel)){S.sel=d.sel;await kvSet('sel',S.sel)}
-await save();rp();lab();toast('Imported');
+await save();rp();lab();toast('Data restored');
 }catch{toast('Invalid backup file')}
 finally{e.target.value=''}
 };
@@ -1165,32 +1357,34 @@ setImg('');chat=await chatGet(chat.id)||chat;render();storageInfo();toast('Image
 };
 
 $('#cdata').onclick=async()=>{
-if(!confirm('Delete ALL data? This cannot be undone!'))return;
+if(!confirm('Delete ALL chats and keys?'))return;
 if(!confirm('Are you absolutely sure?'))return;
 const all=await chatAll();
 for(const c of all)await chatDel(c.id);
 S.prov=[];S.sel=[];S.h={};
 await save();await kvSet('sel',[]);await kvSet('health',{});
-newChat();render();rp();lab();toast('All data cleared');
+newChat();render();rp();lab();toast('Everything cleared');
 };
 
 const storageInfo=()=>navigator.storage?.estimate?.().then(e=>{
 $('#st').textContent='Storage: '+(e.usage/1048576).toFixed(1)+' MB / '+(e.quota/1073741824).toFixed(1)+' GB';
 });
 
-// ============ UTILITIES ============
+// ============ UTILITIES & METRICS ============
 const grow=()=>{const t=$('#in');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
 function meta(){
-const n=$('#in').value.length;
-const s=pend?' · image '+Math.ceil(dataBytes(pend)/1024)+' KB':pendDoc?' · file':'' ;
-$('#meta').textContent=(n?n.toLocaleString()+' / 20,000':'')+s;
+const val=$('#in').value;
+const n=val.length;
+const tokens=estimateTokens(val);
+const s=pend?' · image '+Math.ceil(dataBytes(pend)/1024)+' KB':pendDoc?' · file':'';
+$('#meta').textContent=(n?`${n.toLocaleString()} chars (~${tokens.toLocaleString()} tokens)`:'')+s;
 }
 function scrollState(){
 const m=$('#msgs');
 $('#down').style.display=m.scrollHeight-m.scrollTop-m.clientHeight>220?'block':'none';
 }
 
-// ============ INIT ============
+// ============ INIT & SERVICE WORKER ============
 (async()=>{
 try{
 db=await openDb();
@@ -1211,14 +1405,32 @@ chat=last&&!last.turns.length?last:newChat();
 navigator.storage?.persist?.();
 lab();render();
 if(!S.prov.length){
+S.prov.push({
+id:'pollinations_free',
+name:'Pollinations (Free & Unlimited)',
+url:PRE.Pollinations.url,
+model:PRE.Pollinations.model,
+key:'',
+models:PRE.Pollinations.model,
+keyUrl:''
+});
+S.prov.push({
+id:'gemini_default',
+name:'Gemini (Google)',
+url:PRE.Gemini.url,
+model:PRE.Gemini.model,
+key:'',
+models:PRE.Gemini.model,
+keyUrl:PRE.Gemini.keyUrl
+});
+save();
 rp();
-$('#ds').showModal();
-toast('Welcome! Add an API key to get started.');
+toast('✨ Free Unlimited AI connected! Add Gemini/Groq keys in Settings for extra speed.');
 }
-// Pre-warm speech synthesis
 if('speechSynthesis'in window)speechSynthesis.getVoices();
+if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 }catch(e){
-document.body.innerHTML='<div style="padding:20px;text-align:center"><h2>Failed to initialize</h2><p>'+esc(e.message)+'</p><button onclick="location.reload()">Reload</button></div>';
+document.body.innerHTML='<div style="padding:20px;text-align:center"><h2>Failed to load</h2><p>'+esc(e.message)+'</p><button onclick="location.reload()">Reload</button></div>';
 }
 })();
 </script>
